@@ -1,0 +1,71 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git pull*)",
+      "Bash(python claude/acciones/avisar.py*)",
+      "Bash(python claude/acciones/backup_n8n.py*)",
+      "Bash(python claude/acciones/backup_sql.py*)",
+      "Bash(python claude/acciones/finalizar_etapa.py*)",
+      "Bash(python claude/acciones/motor_detect.py*)",
+      "Bash(python claude/acciones/init_db.py*)",
+      "Bash(npm install*)",
+      "Bash(pip install*)",
+      "Bash(ls*)",
+      "Bash(mkdir*)"
+    ],
+    "deny": [
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(rm -rf*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/check_secrets.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/log_escritura.py"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/notificar.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/iniciar_dashboard.py"
+          }
+        ]
+      }
+    ]
+  }
+}

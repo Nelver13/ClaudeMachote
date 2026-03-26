@@ -1,0 +1,98 @@
+{
+  "permissions": {
+    "allow": [
+      "Read:*",
+      "Bash:git status",
+      "Bash:git diff*",
+      "Bash:git log*",
+      "Bash:git pull",
+      "Bash:ls*",
+      "Bash:npm install*",
+      "Bash:npm run*",
+      "Bash:npm test*",
+      "Bash:pip install*",
+      "Bash:python manage.py*",
+      "Bash:python claude/acciones/avisar.py*",
+      "Bash:python claude/acciones/backup_n8n.py*",
+      "Bash:python claude/acciones/backup_sql.py*",
+      "Bash:flutter*",
+      "Bash:npx expo*",
+      "Bash:dotnet*",
+      "Bash:python -m pytest*",
+      "Bash:mkdir*",
+      "Write:*.md",
+      "Write:*.py",
+      "Write:*.js",
+      "Write:*.jsx",
+      "Write:*.ts",
+      "Write:*.tsx",
+      "Write:*.vb",
+      "Write:*.cs",
+      "Write:*.json",
+      "Write:*.html",
+      "Write:*.xml",
+      "Write:*.css",
+      "Write:App.config",
+      "Write:.gitignore",
+      "Write:.env.example"
+    ],
+    "deny": [
+      "Bash:git commit*",
+      "Bash:git push*",
+      "Bash:git reset --hard*",
+      "Bash:rm -rf*",
+      "Read:.env",
+      "Write:.env"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/check_secrets.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/log_escritura.py",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/notificar.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python claude/acciones/iniciar_dashboard.py",
+            "timeout": 6
+          }
+        ]
+      }
+    ]
+  }
+}

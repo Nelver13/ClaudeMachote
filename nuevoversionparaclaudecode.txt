@@ -1,0 +1,61 @@
+Definir e implementar la estructura operativa ClaudeCode Modelo a seguir(Ipconfig) se peude llamar esteproyecto Que plantailla para agentes
+Crear un repositorio base con la estructura estándar (/context, /planning, /execution, /iterations).
+Establecer archivos obligatorios: vision.md, requirements.md, architecture.md, tasks.md.
+Configurar reglas de flujo: no se construye nada sin pasar por planificación y aprobación.
+Integrar IA como actor dentro del flujo (no como herramienta suelta).
+2. Inicializar proyectos usando la plantilla base
+Clonar la plantilla base de FactorIA.
+Renombrar proyecto y configurar metadatos iniciales.
+Completar vision.md con objetivo claro del sistema.
+Generar automáticamente requirements.md a partir de la idea inicial usando IA.
+Validar que ningún archivo crítico quede vacío antes de avanzar.
+3. Convertir idea en plan estructurado de desarrollo
+Transformar la idea en:
+Problema definido
+Usuarios objetivo
+Casos de uso
+Generar architecture.md con:
+Componentes
+APIs
+Base de datos
+Crear tasks.md dividido en:
+Módulos
+Subtareas ejecutables
+Validar consistencia entre requerimientos y arquitectura.
+4. Planificar el sistema usando Claude Code
+Enviar contexto completo (vision + requirements + constraints).
+Solicitar:
+Arquitectura detallada
+División en módulos técnicos
+Estrategia de implementación
+Refinar iterativamente hasta que:
+No haya ambigüedades
+Todo sea ejecutable directamente
+Guardar salida como versión oficial del plan.
+5. Aprobar la arquitectura antes de ejecutar
+Revisar:
+Escalabilidad
+Separación de responsabilidades
+Tecnologías elegidas
+Validar contra requisitos iniciales.
+Bloquear cambios: marcar arquitectura como baseline.
+No permitir ejecución sin aprobación explícita.
+6. Ejecutar construcción con IA siguiendo el plan
+Alimentar a Claude Code únicamente con:
+architecture.md
+tasks.md
+Ejecutar por módulos (no todo junto).
+Validar cada output:
+Código funcional
+Cumple estructura definida
+Integrar código progresivamente en el repositorio.
+7. Iterar, mejorar y evolucionar el sistema
+Detectar problemas reales:
+Bugs
+Cuellos de botella
+Falta de features
+Generar nuevas tareas en tasks.md.
+Ajustar arquitectura solo si es necesario (versionado).
+Repetir ciclo:
+Plan → Validación → Implementación
+Mantener historial de decisiones técnicas.

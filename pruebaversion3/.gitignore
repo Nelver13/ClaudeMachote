@@ -1,0 +1,65 @@
+# modo ia — .gitignore
+
+# Carpeta claude — nunca a git (memoria, scripts, backups, credenciales)
+claude/
+
+# Motor config (puede contener paths locales)
+.motor/motor.json
+
+# Entorno
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# React + Vite
+node_modules/
+dist/
+.vite/
+
+# Expo / React Native
+.expo/
+android/build/
+ios/build/
+*.ipa
+*.apk
+
+# Flutter
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Electron
+out/
+release/
+
+# Docker
+.docker/
+
+# DB locales
+*.db
+*.sqlite
+
+# Secrets (nunca subir)
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
