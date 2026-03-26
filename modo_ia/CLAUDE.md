@@ -2,6 +2,8 @@
 > Protocolo de trabajo. La IA lee esto al iniciar cada sesión.
 > Skills, motores y memoria del proyecto en sus carpetas correspondientes.
 
+@../ai_scheme/SCHEME.md
+
 ---
 
 ## INICIO DE SESIÓN
@@ -46,6 +48,7 @@ Listo. ¿Continuamos?
 
 ```
 IDEA → disc_[tema].md en creaciones/ o soluciones/
+ (la discusión funciona como nota viva de memoria)
   → "📝 disc_[tema].md — marca 1 cuando hayas leído"
   → [ 1=releer | R:/=incorporar | 0=aprobar ]
   → Estado: Aprobado → plan_XXX.md → ejecución bottom-up
@@ -55,6 +58,7 @@ IDEA → disc_[tema].md en creaciones/ o soluciones/
 **Discusiones:**
 - Idea nueva / feature → `claude/discusiones/creaciones/`
 - Bug / mejora / gap → `claude/discusiones/soluciones/`
+- Base sugerida: `claude/discusiones/TEMPLATE_DISCUSION.md`
 
 **Planes — orden obligatorio:**
 1. Datos (modelos, DB, migraciones)
@@ -62,6 +66,10 @@ IDEA → disc_[tema].md en creaciones/ o soluciones/
 3. API (vistas, rutas, auth)
 4. UI (componentes, páginas)
 5. Integración y tests
+
+**Memoria de continuidad:**
+- Archivo vivo: `claude/memoria/MEMORIA.md`
+- Se actualiza en cierre de etapa y sirve para retomar exactamente dónde quedó
 
 ---
 
@@ -85,7 +93,7 @@ python claude/acciones/backup_sql.py [N]     # si hay DB
 python claude/acciones/avisar.py "Etapa XX terminada" normal
 ```
 
-Luego actualizar `claude/estado.log`.
+Luego actualizar `claude/estado.log` y verificar `claude/memoria/MEMORIA.md`.
 
 ---
 
