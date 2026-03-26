@@ -1,4 +1,4 @@
-# CLAUDE.md — modo ia v1.0
+# CLAUDE.md — modo ia v2.0 (fullstack optimizado)
 > Protocolo de trabajo. La IA lee esto al iniciar cada sesión.
 > Skills, motores y memoria del proyecto en sus carpetas correspondientes.
 
@@ -17,9 +17,9 @@ Leer `claude/estado.log` y determinar el caso:
 4. Esperar aprobación
 
 **Caso B — `claude/` con datos → proyecto con historial**
-Leer `claude/estado.log` y `MAPA.md`. Presentar:
+Leer `claude/estado.log`, `MAPA.md` y `VISION.md`. Presentar:
 ```
-Proyecto : [PROJ]  |  Stack : [STACK]
+Proyecto : [PROJ]  |  Stack : [STACK]  |  Visión: [multi-solución?]
 Etapa    : [ETAPA] |  Motor : [motor detectado]
 Último   : [LAST_TASK]
 Próximo  : [NEXT]
