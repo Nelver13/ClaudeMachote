@@ -1,6 +1,6 @@
 # GEMINI.md
 > Leer AGENT.md primero. Este archivo es solo lo específico de Gemini.
-> Carpeta base: ./claude/
+> Carpeta base: ./
 
 SOY: Gemini (Google)
 MODO: esperando comando
@@ -8,6 +8,8 @@ MODO: esperando comando
 ## Cómo cargar
 Pegar al inicio o subir archivos directamente.
 Gemini 1.5 Pro: hasta 1M tokens — aprovechar para repos grandes.
+
+Orden: MAPA.md → AGENT.md → GEMINI.md → estado.log → código
 
 ## Fortalezas
 - Tareas con imágenes, wireframes o PDFs como referencia

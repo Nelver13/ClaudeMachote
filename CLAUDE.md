@@ -1,13 +1,13 @@
 # CLAUDE.md
 > Leer AGENT.md primero. Este archivo es solo lo específico de Claude.
-> Carpeta base: ./claude/
+> Carpeta base: ./
 
 SOY: Claude (Anthropic)
 MODO: esperando comando
 
 ## Cómo cargar en Claude Code
 Claude Code lee CLAUDE.md automáticamente.
-En claude.ai: pegar AGENT.md + CLAUDE.md + estado.log al inicio.
+En claude.ai: pegar MAPA.md + AGENT.md + CLAUDE.md + estado.log al inicio.
 
 ## Fortalezas
 - Razonamiento multi-paso complejo
@@ -20,5 +20,5 @@ En claude.ai: pegar AGENT.md + CLAUDE.md + estado.log al inicio.
 - Sin frases de cortesía
 
 ## Benchmark — qué registrar
-Archivo: ./claude/benchmark/resultados.md
+Archivo: ./benchmark/resultados.md
 | Fecha | Claude | Tarea | Calidad/5 | Errores | Notas |

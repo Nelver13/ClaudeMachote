@@ -23,7 +23,7 @@ PATRONES_PELIGROSOS = [
 
 # Comandos siempre permitidos
 WHITELIST = [
-    'python claude/acciones/avisar.py',
+    'python acciones/avisar.py',
     'python manage.py',
     'git status',
     'git diff',

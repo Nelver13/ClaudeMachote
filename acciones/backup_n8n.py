@@ -2,7 +2,7 @@
 # ARCHIVO: backup_n8n.py
 # QUÉ HACE: Exporta todos los flujos de n8n a JSON y los guarda en claude/backups/n8n/
 # CÓMO ENCAJA: Claude lo llama al cerrar cada etapa
-# PARA EDITAR: URL y API_KEY de n8n en claude/acciones/credenciales.md
+# PARA EDITAR: URL y API_KEY de n8n en acciones/credenciales.md
 # DEPENDENCIAS: solo librería estándar Python
 
 import sys

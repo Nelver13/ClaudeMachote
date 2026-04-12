@@ -1,13 +1,13 @@
 # KIMI.md
 > Leer AGENT.md primero. Este archivo es solo lo específico de Kimi.
-> Carpeta base: ./claude/
+> Carpeta base: ./
 
 SOY: Kimi (Moonshot AI)
 MODO: esperando comando
 
 ## Cómo cargar
 Pegar todo junto al inicio (Kimi soporta 128K tokens):
-  [AGENT.md] + [KIMI.md] + [estado.log] + [plan completo] + [código relevante]
+  [MAPA.md] + [AGENT.md] + [KIMI.md] + [estado.log] + [plan completo] + [código relevante]
 
 ## Fortalezas
 - Leer repositorio completo de una vez

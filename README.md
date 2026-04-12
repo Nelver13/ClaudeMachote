@@ -3,7 +3,7 @@
 ## Estructura
 
 ```
-./claude/
+./
   AGENT.md        ← reglas universales (todas las IAs leen esto)
   CLAUDE.md       ← específico Claude
   CODEX.md        ← específico Codex/GPT
@@ -22,7 +22,7 @@
 ## Inicio rápido
 
 ### 1. Configurar notificaciones (opcional)
-Editar `./claude/acciones/credenciales.md` con tu webhook de Discord o topic de ntfy.
+Editar `./acciones/credenciales.md` con tu webhook de Discord o topic de ntfy.
 
 ### 2. Iniciar con cualquier IA
 Pegar al inicio de la sesión:
@@ -51,6 +51,6 @@ modo:benchmark    → comparar IAs
 ## Benchmark
 
 Para comparar IAs en la misma tarea:
-1. Definir tarea en `./claude/benchmark/tareas_test.md`
+1. Definir tarea en `./benchmark/tareas_test.md`
 2. Darla a cada IA por separado con `modo:benchmark`
-3. Ver resultados en `./claude/benchmark/resultados.md`
+3. Ver resultados en `./benchmark/resultados.md`

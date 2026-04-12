@@ -1,6 +1,6 @@
 # AGENT.md
 > Claude / Kimi / Codex / Gemini — leer esto.
-> Carpeta base: ./claude/
+> Carpeta base: ./
 
 ## REGLA PRINCIPAL
 No hablar. Hacer. Avisar.
@@ -24,9 +24,9 @@ Esta sesión es la discusión y el plan al mismo tiempo.
 - La IA propone, razona, estructura
 - Tú intervienes con `r/` — eso redirige todo
 - La IA ajusta y sigue
-- Al final: plan cerrado en `./claude/planes/[modulo]/v[N].md`
+- Al final: plan cerrado en `./planes/[modulo]/v[N].md`
 
-**La IA guarda la sesión en** `./claude/discs/[modulo]/v[N].md`:
+**La IA guarda la sesión en** `./discs/[modulo]/v[N].md`:
 ```
 ia/ [propuesta o razonamiento]
 r/  [tu intervención — esto manda]
@@ -34,31 +34,54 @@ ia/ [ajuste]
 r/  ok
 ```
 
-**Al cerrar el plan:**
+**Al cerrar la discusión:**
+
+Cuando tú dices `ok`, la IA ejecuta:
 ```bash
-python ./claude/acciones/avisar.py "Plan [modulo]/v[N] listo — [N] tareas — revisa" normal
+python ./acciones/finalizar_discusion.py [modulo] [version]
 ```
 
-Tú lees el plan. Dices `ok` o reabres la discusión. El respaldo en discs/ queda para referencia futura.
+Solo avisa: **"DISC: [modulo]/v[N] lista — revisa y dime ok"**
+
+**Tú:**
+1. Revisas el plan en `planes/` o `discs/`
+2. Si hay cambios → reabres discusión con feedback
+3. Si está OK → dices "modo:dev" o pegas el prompt de inicio
 
 ---
 
-## MODO DEV
+## MODO DEV (tarea por tarea)
 
-1. Leer `./claude/estado.log` → `TAREA_ACTUAL`
-2. Ejecutar solo esa tarea
-3. Marcar `[x]`, actualizar `estado.log`
-4. Avisar:
+**Flujo:**
+1. Leer `estado.log` → `TAREA_ACTUAL`
+2. Ejecutar SOLO esa tarea
+3. **Si hay problema/bloqueo:**
+   ```bash
+   python ./acciones/avisar.py "PROBLEMA: [qué pasa]" urgente
+   ```
+   → Tú revisas, das instrucciones, continúa
 
+4. **Si tarea completada OK:**
+   ```bash
+   python ./acciones/completar_tarea.py [N] [total]
+   ```
+   → Si es última tarea: avisa **"🎉 PLAN COMPLETO"**
+   → Si hay más: avisa **"Tarea N/M lista — siguiente: N+1"**
+
+**Nunca:** hacer dos tareas seguidas sin avisar.
+
+---
+
+## MAPA DEL PROYECTO
+
+Antes de cada sesión:
+1. Leer `MAPA.md` — índice rápido del proyecto (embedding-optimized)
+2. Leer `estado.log` — estado actual
+
+**Si cambias la estructura (nuevos archivos, carpetas, renombres):**
 ```bash
-# Tarea lista:
-python ./claude/acciones/avisar.py "Tarea N/Total: [nombre]" normal
-
-# Necesitas revisar algo antes de continuar:
-python ./claude/acciones/avisar.py "REVISAR: [qué — 1 línea]" urgente
+python ./acciones/actualizar_mapa.py
 ```
-
-Tú ves. Dices `ok`. Siguiente tarea.
 
 ---
 
@@ -72,6 +95,10 @@ Tú ves. Dices `ok`. Siguiente tarea.
 ```
 
 ---
+
+## SIEMPRE
+- Actualizar `MAPA.md` tras cambios estructurales (nuevos archivos/carpetas)
+- Verificar `estado.log` al inicio de cada sesión
 
 ## NUNCA
 - Parla antes o después del trabajo

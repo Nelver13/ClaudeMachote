@@ -1,4 +1,4 @@
-# claude/acciones/ — Scripts del sistema
+# acciones/ — Scripts del sistema
 
 ## Quien llama cada script
 
@@ -22,9 +22,9 @@
 
 ## Diagnostico
 ```bash
-python claude/acciones/avisar.py --test
+python acciones/avisar.py --test
 ```
-Log: `claude/logs/notificaciones.log`
+Log: `logs/notificaciones.log`
 
 ## Credenciales
 En `credenciales.md` — mismo directorio.

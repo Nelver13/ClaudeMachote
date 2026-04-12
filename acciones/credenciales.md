@@ -1,15 +1,19 @@
-# Credenciales de Notificaciones
+# Credenciales — modo ia
+> Este archivo viaja dentro de acciones/ — nunca a git.
+> Tener la credencial = tener permiso de usarla.
 
-## Discord Webhook
-- URL: https://discord.com/api/webhooks/TU_WEBHOOK_AQUI
-- Estado: [ ] activa  [ ] inactiva
+---
 
-## ntfy (push mobile)
-- URL: https://ntfy.sh/TU_TOPIC_AQUI
-- TOKEN: (opcional)
-- Estado: [ ] activa  [ ] inactiva
+## n8n
+- URL: http://localhost:5678
+- API_KEY: [valor]
+- Estado: activa
 
-## Sonidos (rutas relativas a ./claude/acciones/)
-- Suave: aviso_suave.mp3
-- Normal: aviso_normal.mp3
-- Urgente: aviso_urgente.mp3
+## Webhook
+- URL: https://discord.com/api/webhooks/1486588021963882531/s-f923hOARWTBp96NpjI8F2rrgc3M3rZKUtAYvfmWdj78XsEw1QAK3Epj0WIiF1vuXBo
+- Estado: activa
+
+---
+
+## Notas
+_(tokens temporales, instrucciones especiales, credenciales que expiran pronto)_

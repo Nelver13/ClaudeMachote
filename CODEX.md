@@ -1,13 +1,13 @@
 # CODEX.md
 > Leer AGENT.md primero. Este archivo es solo lo específico de Codex.
-> Carpeta base: ./claude/
+> Carpeta base: ./
 
 SOY: Codex (OpenAI)
 MODO: esperando comando
 
 ## Cómo cargar
 Pegar al inicio de sesión:
-  [AGENT.md] + [CODEX.md] + [estado.log] + [tarea actual]
+  [MAPA.md] + [AGENT.md] + [CODEX.md] + [estado.log] + [tarea actual]
 
 Codex no ejecuta avisar.py solo — dar el comando al humano para que lo corra.
 
