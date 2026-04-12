@@ -1,5 +1,5 @@
 # RESUMEN — ClaudeMachote
 
-Sistema dual: Gemini (arquitecto) + Claude (desarrollador).
-Gemini genera planes en claude/planes/, Claude los ejecuta y marca [x].
+Sistema de trabajo con Claude Code.
+Opus = arquitecto (discute y planea). Sonnet = desarrollador (ejecuta y codifica).
 Workspace en claude/ — nunca a git.

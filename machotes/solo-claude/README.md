@@ -2,17 +2,16 @@
 
 Sistema de trabajo con Claude Code para proyectos de software.
 
-- **Kimi** = arquitecto (discute, diseña, genera planes)
-- **Claude Code** = desarrollador (lee planes, escribe codigo, marca [x])
+- **Opus 4.6** = arquitecto (discute, diseña, genera planes)
+- **Sonnet 4.6** = desarrollador (lee planes, escribe codigo, marca [x])
 
-Un `KIMI.md` para el arquitecto y un `CLAUDE.md` para el ejecutor.
+Un solo `CLAUDE.md` — Claude detecta el modelo y asume el rol correcto.
 
 ---
 
 ## Requisitos
 
 - [Claude Code](https://claude.ai/code)
-- [Kimi](https://kimi.ai) — chat web o API
 - Python 3.x
 
 ---
@@ -21,8 +20,7 @@ Un `KIMI.md` para el arquitecto y un `CLAUDE.md` para el ejecutor.
 
 ```
 proyecto/
-├── CLAUDE.md           <- instrucciones para Claude Code (rol ejecutor)
-├── KIMI.md             <- instrucciones para Kimi (rol arquitecto)
+├── CLAUDE.md           <- instrucciones para Claude (ambos roles)
 ├── roadmap.md          <- vision y estado del proyecto
 ├── .gitignore
 ├── .claude/
@@ -44,23 +42,23 @@ proyecto/
 
 ## Flujo de trabajo
 
-### 1. Arquitecto (Kimi)
-```
-Abrir kimi.ai y pegar el contenido de KIMI.md al inicio
-Discutir idea → 0 → Kimi genera plan_XXX.md
+### 1. Arquitecto (Opus)
+```bash
+claude  # abrir con modelo Opus
+# Claude anuncia: Modo ARQUITECTO
+# Discutir idea → 0 → genera plan
 ```
 
-### 2. Desarrollador (Claude Code)
+### 2. Desarrollador (Sonnet)
 ```bash
-claude  # abrir Claude Code con Sonnet
+claude  # abrir con modelo Sonnet
+# Claude anuncia: Modo DESARROLLADOR
 s       # ejecutar plan tarea por tarea
 ```
 
 ### 3. Revision
-```
-Claude avisa al terminar (popup Windows + Discord).
-Vos revisas → "ok" en Kimi para aprobar → siguiente modulo.
-```
+Claude avisa al terminar cada respuesta (popup Windows + Discord).
+Vos revisas → `ok` en Opus para aprobar → siguiente modulo.
 
 ---
 
@@ -91,7 +89,7 @@ python claude/acciones/avisar.py --test
 
 ## Reglas de oro
 
-- Kimi no escribe codigo. Claude no crea planes.
+- Opus no escribe codigo. Sonnet no crea planes.
 - `git commit/push` solo lo hace el arquitecto (vos).
 - `claude/` nunca va a git.
 - Credenciales en `claude/acciones/credenciales.md`.

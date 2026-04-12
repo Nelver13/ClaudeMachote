@@ -59,4 +59,4 @@
 
 ## Historial de modulos completados
 
-_(Gemini agrega una linea por cada modulo aprobado)_
+_(Kimi agrega una linea por cada modulo aprobado)_
