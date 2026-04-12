@@ -1,97 +1,56 @@
-# ClaudeMachote
-
-Sistema de trabajo con Claude Code para proyectos de software.
-
-- **Kimi** = arquitecto (discute, diseña, genera planes)
-- **Claude Code** = desarrollador (lee planes, escribe codigo, marca [x])
-
-Un `KIMI.md` para el arquitecto y un `CLAUDE.md` para el ejecutor.
-
----
-
-## Requisitos
-
-- [Claude Code](https://claude.ai/code)
-- [Kimi](https://kimi.ai) — chat web o API
-- Python 3.x
-
----
+# Sistema Multi-IA — Guía rápida
 
 ## Estructura
 
 ```
-proyecto/
-├── CLAUDE.md           <- instrucciones para Claude Code (rol ejecutor)
-├── KIMI.md             <- instrucciones para Kimi (rol arquitecto)
-├── roadmap.md          <- vision y estado del proyecto
-├── .gitignore
-├── .claude/
-│   └── settings.json   <- hook check_secrets
-└── claude/             <- workspace (no va a git)
-    ├── acciones/       <- scripts: avisar.py, credenciales.md, etc.
-    ├── discusiones/
-    │   ├── creaciones/ <- nuevas features
-    │   └── soluciones/ <- bugs y fixes
-    ├── planes/         <- plan_*.md
-    ├── memoria/        <- memoria por modulo completado
-    ├── backups/
-    ├── logs/
-    ├── RESUMEN.md
-    └── estado.log
+./claude/
+  AGENT.md        ← reglas universales (todas las IAs leen esto)
+  CLAUDE.md       ← específico Claude
+  CODEX.md        ← específico Codex/GPT
+  KIMI.md         ← específico Kimi
+  GEMINI.md       ← específico Gemini
+  estado.log      ← estado compartido del proyecto
+  acciones/
+    avisar.py     ← notificaciones (sonido + popup + discord + ntfy)
+    credenciales.md ← configurar webhook y ntfy aquí
+  planes/         ← planes maestros por módulo
+  memoria/        ← historial de progreso
+  benchmark/      ← comparar qué IA hace qué mejor
+  logs/           ← log de notificaciones
 ```
 
----
+## Inicio rápido
 
-## Flujo de trabajo
+### 1. Configurar notificaciones (opcional)
+Editar `./claude/acciones/credenciales.md` con tu webhook de Discord o topic de ntfy.
 
-### 1. Arquitecto (Kimi)
+### 2. Iniciar con cualquier IA
+Pegar al inicio de la sesión:
 ```
-Abrir kimi.ai y pegar el contenido de KIMI.md al inicio
-Discutir idea → 0 → Kimi genera plan_XXX.md
-```
-
-### 2. Desarrollador (Claude Code)
-```bash
-claude  # abrir Claude Code con Sonnet
-s       # ejecutar plan tarea por tarea
+[Pegar contenido de AGENT.md]
+[Pegar contenido de CLAUDE.md / CODEX.md / KIMI.md / GEMINI.md]
+[Pegar contenido de estado.log]
 ```
 
-### 3. Revision
+### 3. Activar modo
 ```
-Claude avisa al terminar (popup Windows + Discord).
-Vos revisas → "ok" en Kimi para aprobar → siguiente modulo.
-```
-
----
-
-## Setup inicial
-
-```bash
-# Copiar proyecto_listo/ a tu proyecto nuevo
-# Configurar credenciales Discord:
-# Editar: claude/acciones/credenciales.md
-
-# Probar avisos:
-python claude/acciones/avisar.py --test
+modo:arquitecto   → diseñar plan
+modo:dev          → ejecutar tarea actual
+modo:benchmark    → comparar IAs
 ```
 
----
+## Cuándo usar cada IA
 
-## Scripts
+| IA | Mejor para |
+|----|-----------|
+| Claude | Razonamiento complejo, refactoring con contexto, documentación |
+| Kimi | Contexto muy largo, leer repo completo, planificación detallada |
+| Codex | Generación rápida de código, boilerplate, tests |
+| Gemini | Tareas con imágenes/PDFs, búsqueda en docs, casos edge |
 
-| Script | Uso |
-|---|---|
-| `avisar.py "msg" suave\|normal\|urgente` | Notificacion con popup + sonido |
-| `actualizar_checklist.py` | Marca [x] en plan |
-| `backup_n8n.py [etapa]` | Backup n8n |
-| `backup_sql.py [etapa]` | Backup DB |
-| `finalizar_etapa.py` | Cierre de etapa |
+## Benchmark
 
----
-
-## Reglas de oro
-
-- Kimi no escribe codigo. Claude no crea planes.
-- `git commit/push` solo lo hace el arquitecto (vos).
-- `claude/` nunca va a git.
-- Credenciales en `claude/acciones/credenciales.md`.
+Para comparar IAs en la misma tarea:
+1. Definir tarea en `./claude/benchmark/tareas_test.md`
+2. Darla a cada IA por separado con `modo:benchmark`
+3. Ver resultados en `./claude/benchmark/resultados.md`
