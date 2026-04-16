@@ -1,0 +1,19 @@
+# ── Sistema IA local — nunca sube ────────────────────────
+sistema-ia/
+ESTADO.md
+INICIO.md
+AGENTS.md
+CLAUDE.md
+KIMI.md
+CODEX.md
+GEMINI.md
+RESUMEN.md
+
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+
+# ── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
