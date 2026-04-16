@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(python*)",
+      "Bash(python3*)",
+      "Read(**)",
+      "Write(sistema-ia/**)",
+      "Write(discusiones/**)",
+      "Write(planes/**)",
+      "Write(memoria/**)",
+      "Edit(sistema-ia/**)",
+      "Edit(discusiones/**)",
+      "Edit(planes/**)",
+      "Edit(memoria/**)",
+      "Edit(ESTADO.md)",
+      "Edit(INICIO.md)",
+      "Edit(AGENTS.md)",
+      "Glob(**)",
+      "Grep(**)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python sistema-ia/acciones/auto_setup.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python sistema-ia/acciones/check_role.py"
+          }
+        ]
+      }
+    ]
+  }
+}

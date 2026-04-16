@@ -1,13 +1,12 @@
-# ── Sistema IA local — nunca sube ────────────────────────
-sistema-ia/
-ESTADO.md
-INICIO.md
-AGENTS.md
-CLAUDE.md
-KIMI.md
-CODEX.md
-GEMINI.md
-RESUMEN.md
+# ── Sistema IA local — nunca sube (solo raíz) ────────────
+/sistema-ia/
+/ESTADO.md
+/INICIO.md
+/AGENTS.md
+/KIMI.md
+/CODEX.md
+/GEMINI.md
+/RESUMEN.md
 
 # ── Python ───────────────────────────────────────────────
 __pycache__/
@@ -17,5 +16,3 @@ __pycache__/
 # ── OS ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-machote/PROMPT_INSTALAR.md
-machote/PROMPT_MIGRAR.md
