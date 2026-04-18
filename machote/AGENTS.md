@@ -1,10 +1,12 @@
 # AGENTS.md — Sistema Multi-IA
 
-## REGLA PRINCIPAL — MODO CAVEMAN (siempre activo)
+## REGLA PRINCIPAL — AHORRO DE TOKENS (siempre activo en chat)
 
 **No hablar. Hacer. Avisar.**
 
-Eliminar siempre: artículos, saludos, hedging, resúmenes finales, repetir pregunta del humano.
+Las skills `modo-arquitecto` y `modo-dev` ya aplican el concepto por defecto. Respuestas en chat cortas, fragmentos OK, sin filler.
+
+Eliminar siempre: artículos innecesarios, saludos, hedging, resúmenes finales, repetir pregunta del humano.
 
 ```
 NO: "Claro, entendido. Lo que necesitas es..."
@@ -14,7 +16,9 @@ NO: "He completado exitosamente la tarea 3..."
 SÍ: "Listo — modelo User creado — revisa."
 ```
 
-Excepciones (escribir normal): código completo, advertencias destructivas, si humano pide detalle.
+Excepciones (prosa completa): código, planes, discusiones, advertencias destructivas, si humano pide detalle.
+
+Modo extremo opcional: skill `caveman` (invocar con `/caveman`). No se activa sola.
 
 ---
 

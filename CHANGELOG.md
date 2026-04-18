@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.3 — 2026-04-18
+### Corregido (bloqueadores reportados en proyectos reales)
+- **Arquitecto saltaba directo a dev sin generar plan ni PROMPT_DEV.** Paso `0` del modo-arquitecto ahora valida en disco que el plan exista y que `finalizar_discusion.py` haya generado `handoff/[modulo].json` antes de cambiar `[ESTADO_PLAN: Listo para dev]`. Si algún paso falla → avisa urgente y PARA.
+- **Rutas rotas en skills:** `sistema-ia/.claude/ia/acciones/` reemplazado por `sistema-ia/acciones/` en modo-arquitecto y modo-dev (causaba que los scripts nunca se ejecutaran al ser llamados por la IA).
+- **Avisos no disparaban en proyectos clonados:** `avisar.py` usaba `Path` sin importar + `parents[3]` del layout viejo. Fix: `from pathlib import Path` + búsqueda robusta de `ESTADO.md` subiendo hasta 6 niveles.
+- **Scripts faltantes en clones viejos:** `migrar.py` ahora **REPLENECE** scripts/skills/assets (mp3s, caveman, credenciales) además de actualizar. Proyectos con clon incompleto se recuperan con `python sistema-ia/acciones/migrar.py`.
+- **Ahorro de tokens no se respetaba:** concepto embebido directamente en las skills `modo-arquitecto` y `modo-dev` (sección "Estilo de respuesta en chat"). La skill `caveman` queda disponible pero opcional — ya no se depende de ella para la compresión por defecto.
+
+### Agregado
+- **Auto-detección de nueva versión:** `auto_setup.py` (SessionStart hook) compara `sistema-ia/VERSION` local vs `origin/main:VERSION` y avisa en el contexto de la sesión cuando hay actualización disponible, con el comando exacto a ejecutar. Silencioso si no hay red/git.
+- `VERSION` en raíz del repo, `machote/VERSION`, `machote/sistema-ia/VERSION` — todos en `2.3`.
+- Validación estricta de handoff en modo-arquitecto paso `0`.
+
+---
+
+## v2.2 — 2026-04-16
+### Corregido
+- Faltaban todos los scripts en `machote/sistema-ia/acciones/` (solo había 2)
+- Agregados: avisar.py, cambiar_rol.py, cerrar_sesion.py, comprimir_discusion.py, finalizar_discusion.py, finalizar_plan.py, check_role.py, completar_tarea.py, check_secrets.py + mp3s
+- Skill caveman agregado a machote
+- Skills modo-dev y modo-arquitecto con flujo explícito de avisos y marcado de tareas [x]
+- migrar.py inteligente: detecta versión, actualiza solo scripts/skills, no toca trabajo activo
+
+---
+
 ## v2.1 — 2026-04-16
 ### Agregado
 - `auto_setup.py` — SessionStart hook: detecta proyecto nuevo vs existente, carga contexto automático

@@ -1,6 +1,7 @@
 # INICIO — Lee esto primero
 
 Lee `ESTADO.md` → detecta tu rol → actúa.
+Si vas a mejorar el sistema: lee `sistema-ia/SISTEMA.md` primero.
 
 ## Si eres ARQUITECTO
 - Debate con humano (preguntas cerradas, una por una)

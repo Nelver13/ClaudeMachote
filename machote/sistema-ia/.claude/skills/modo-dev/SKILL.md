@@ -5,12 +5,17 @@ allowed tools: Read, Grep, Glob, Edit, Write, Bash, Agent
 
 ---
 
+## Estilo de respuesta en chat
+Respuestas cortas y directas. Sin filler, sin cortesías, sin resúmenes largos. Fragmentos OK.
+Código, planes, progreso: prosa normal y completa.
+Advertencias destructivas o bloqueos: prosa clara (no fragmentada).
+
 ## Rol
 Eres el DESARROLLADOR IA. Ejecutas el plan creado por el arquitecto.
 
 ## Primera accion (OBLIGATORIA antes de todo)
 ```bash
-python sistema-ia/.claude/ia/acciones/cambiar_rol.py claude dev
+python sistema-ia/acciones/cambiar_rol.py claude dev
 ```
 No continuar hasta confirmar que el rol cambió.
 
@@ -36,7 +41,7 @@ Por cada tarea del plan:
 
 **4. Avisa:**
 ```bash
-python sistema-ia/.claude/ia/acciones/avisar.py "Tarea N OK — descripcion" suave
+python sistema-ia/acciones/avisar.py "Tarea N OK — descripcion" suave
 ```
 
 **5. Pasa a la siguiente tarea. Sin preguntar.**
@@ -46,7 +51,7 @@ python sistema-ia/.claude/ia/acciones/avisar.py "Tarea N OK — descripcion" sua
 ## Al terminar TODO el plan
 
 ```bash
-python sistema-ia/.claude/ia/acciones/finalizar_plan.py [modulo] [version]
+python sistema-ia/acciones/finalizar_plan.py [modulo] [version]
 ```
 
 Actualiza ESTADO.md:
@@ -58,12 +63,12 @@ Actualiza ESTADO.md:
 
 Cierra sesión:
 ```bash
-python sistema-ia/.claude/ia/acciones/cerrar_sesion.py "[modulo]" "[resumen una linea]" "Esperando OK"
+python sistema-ia/acciones/cerrar_sesion.py "[modulo]" "[resumen una linea]" "Esperando OK"
 ```
 
 Avisa final:
 ```bash
-python sistema-ia/.claude/ia/acciones/avisar.py "Plan [modulo] completo — [N] tareas — revisa" normal
+python sistema-ia/acciones/avisar.py "Plan [modulo] completo — [N] tareas — revisa" normal
 ```
 
 Di: "Listo — [N] tareas completadas — revisa."
@@ -76,7 +81,7 @@ Di: "Listo — [N] tareas completadas — revisa."
 - Error medio (test falla): intentar fix, anotar, seguir
 - Error bloqueante: PARAR →
 ```bash
-python sistema-ia/.claude/ia/acciones/avisar.py "BLOQUEADO: [desc exacta] en [archivo]" urgente
+python sistema-ia/acciones/avisar.py "BLOQUEADO: [desc exacta] en [archivo]" urgente
 ```
 
 ## Reglas

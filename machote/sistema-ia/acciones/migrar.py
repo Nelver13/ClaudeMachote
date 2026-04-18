@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 migrar.py — Actualiza sistema IA a la versión más reciente.
-Detecta versión actual y actualiza SOLO scripts/skills.
-NUNCA toca: planes/, discusiones/, memoria/, ESTADO.md — trabajo activo intacto.
+- Actualiza scripts/skills existentes (sobrescribe con backup).
+- REPLENECE scripts/skills faltantes (caso: clon incompleto).
+- NUNCA toca: planes/, discusiones/, memoria/, handoff/, ESTADO.md.
 
 Uso: python sistema-ia/acciones/migrar.py
 """
@@ -15,7 +16,7 @@ SIA        = ROOT / "sistema-ia"
 BACKUP_DIR = SIA / "_backup_migracion"
 VERSION_FILE = SIA / "VERSION"
 
-# Scripts que SE ACTUALIZAN siempre (sobrescriben)
+# Scripts que SE ACTUALIZAN / REPLENECEN
 SCRIPTS_ACTUALIZAR = [
     "avisar.py",
     "cambiar_rol.py",
@@ -24,26 +25,32 @@ SCRIPTS_ACTUALIZAR = [
     "finalizar_discusion.py",
     "finalizar_plan.py",
     "check_role.py",
+    "check_secrets.py",
     "completar_tarea.py",
-    "actualizar_mapa.py",
-    "actualizar_checklist.py",
     "auto_setup.py",
     "migrar.py",
 ]
 
-# Skills que SE ACTUALIZAN siempre
+# Assets auxiliares (mp3 + credenciales)
+ASSETS_ACTUALIZAR = [
+    "aviso_suave.mp3",
+    "aviso_normal.mp3",
+    "aviso_urgente.mp3",
+    "credenciales.md",
+]
+
+# Skills que SE ACTUALIZAN / REPLENECEN
 SKILLS_ACTUALIZAR = [
     ".claude/skills/modo-dev/SKILL.md",
     ".claude/skills/modo-arquitecto/SKILL.md",
     ".claude/skills/caveman/SKILL.md",
 ]
 
-# Settings que SE ACTUALIZA (merge seguro)
 SETTINGS = ".claude/settings.json"
 
-# Archivos viejos de sistema pre-v2.0
+# Archivos viejos pre-v2.0
 ARCHIVOS_VIEJOS = ["AGENT.md", "MAPA.md", "estado.log", "ia_roles.json"]
-CARPETAS_VIEJAS = ["acciones", "benchmark", "discs", "logs", "backups", "machote-ia-hooks"]
+CARPETAS_VIEJAS = ["acciones", "benchmark", "discs", "backups", "machote-ia-hooks"]
 
 # NUNCA tocar
 PROTEGIDOS = ["planes", "discusiones", "memoria", "handoff", "ESTADO.md"]
@@ -52,17 +59,17 @@ PROTEGIDOS = ["planes", "discusiones", "memoria", "handoff", "ESTADO.md"]
 def version_actual() -> str:
     if VERSION_FILE.exists():
         return VERSION_FILE.read_text(encoding="utf-8").strip()
-    # Detectar v2.0 por estructura
     if (SIA / "acciones").exists():
         return "2.0"
     return "1.x"
 
 
 def version_nueva() -> str:
-    src = Path(__file__).parent / ".." / ".." / "VERSION"
+    # El machote clonado trae VERSION en su raíz
+    src = Path(__file__).parents[1] / "VERSION"  # sistema-ia/VERSION del clon
     if src.exists():
         return src.read_text(encoding="utf-8").strip()
-    return "2.1"
+    return "2.3"
 
 
 def backup(archivos: list, tag: str):
@@ -93,39 +100,57 @@ def limpiar_viejos():
     return movidos
 
 
-def actualizar_scripts():
-    src_acciones = Path(__file__).parent  # la carpeta acciones del machote clonado
-    dst_acciones = SIA / "acciones"
-    dst_acciones.mkdir(parents=True, exist_ok=True)
-
+def sincronizar_archivos(src_dir: Path, dst_dir: Path, nombres: list, tag: str):
+    """
+    Copia cada nombre de src_dir → dst_dir. Si dst existe, backup + sobrescribe.
+    Si dst no existe, lo replenece. Devuelve (actualizados, replenecidos).
+    """
+    dst_dir.mkdir(parents=True, exist_ok=True)
     actualizados = []
-    for nombre in SCRIPTS_ACTUALIZAR:
-        src = src_acciones / nombre
-        dst = dst_acciones / nombre
-        if src.exists():
-            # Backup del viejo antes de sobrescribir
-            if dst.exists():
-                backup([dst], "scripts")
+    replenecidos = []
+    for nombre in nombres:
+        src = src_dir / nombre
+        dst = dst_dir / nombre
+        if not src.exists():
+            continue
+        if dst.exists():
+            backup([dst], tag)
             shutil.copy2(str(src), str(dst))
             actualizados.append(nombre)
-    return actualizados
+        else:
+            shutil.copy2(str(src), str(dst))
+            replenecidos.append(nombre)
+    return actualizados, replenecidos
+
+
+def actualizar_scripts_y_assets():
+    src = Path(__file__).parent  # acciones/ del machote clonado
+    dst = SIA / "acciones"
+    act1, rep1 = sincronizar_archivos(src, dst, SCRIPTS_ACTUALIZAR, "scripts")
+    act2, rep2 = sincronizar_archivos(src, dst, ASSETS_ACTUALIZAR, "assets")
+    return act1 + act2, rep1 + rep2
 
 
 def actualizar_skills():
-    src_base = Path(__file__).parents[1]  # sistema-ia/ del machote
+    src_base = Path(__file__).parents[1]  # sistema-ia/ del machote clonado
     dst_base = SIA
     actualizados = []
+    replenecidos = []
 
     for skill_path in SKILLS_ACTUALIZAR:
         src = src_base / skill_path
         dst = dst_base / skill_path
-        if src.exists():
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            if dst.exists():
-                backup([dst], "skills")
+        if not src.exists():
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if dst.exists():
+            backup([dst], "skills")
             shutil.copy2(str(src), str(dst))
             actualizados.append(skill_path)
-    return actualizados
+        else:
+            shutil.copy2(str(src), str(dst))
+            replenecidos.append(skill_path)
+    return actualizados, replenecidos
 
 
 def actualizar_version(nueva: str):
@@ -140,31 +165,39 @@ def main():
     print(f"Proyecto: {ROOT.name}")
     print()
 
-    if v_actual == v_nueva:
-        print(f"Ya en v{v_nueva}. Nada que hacer.")
-        return
-
-    # 1. Limpiar archivos pre-v2.0 si existen
+    # 1. Limpiar archivos pre-v2.0
     viejos = limpiar_viejos()
     if viejos:
         print(f"Archivos pre-v2.0 movidos a backup: {', '.join(viejos)}")
 
-    # 2. Actualizar scripts
-    scripts = actualizar_scripts()
-    print(f"Scripts actualizados ({len(scripts)}): {', '.join(scripts)}")
+    # 2. Scripts + assets (actualiza + replenece)
+    act_scripts, rep_scripts = actualizar_scripts_y_assets()
+    if act_scripts:
+        print(f"Scripts/assets actualizados ({len(act_scripts)}): {', '.join(act_scripts)}")
+    if rep_scripts:
+        print(f"Scripts/assets REPLENECIDOS ({len(rep_scripts)}): {', '.join(rep_scripts)}")
 
-    # 3. Actualizar skills
-    skills = actualizar_skills()
-    print(f"Skills actualizados ({len(skills)}): {', '.join(skills)}")
+    # 3. Skills (actualiza + replenece)
+    act_skills, rep_skills = actualizar_skills()
+    if act_skills:
+        print(f"Skills actualizados ({len(act_skills)}): {', '.join(act_skills)}")
+    if rep_skills:
+        print(f"Skills REPLENECIDOS ({len(rep_skills)}): {', '.join(rep_skills)}")
 
-    # 4. Crear carpetas faltantes (sin tocar existentes)
+    # 4. Crear carpetas faltantes
     for carpeta in ["planes", "discusiones", "memoria/sesiones", "handoff", "logs"]:
         p = SIA / carpeta
         p.mkdir(parents=True, exist_ok=True)
 
-    # 5. Actualizar VERSION
-    actualizar_version(v_nueva)
-    print(f"\nVersión actualizada: {v_actual} → {v_nueva}")
+    # 5. VERSION
+    if v_actual != v_nueva:
+        actualizar_version(v_nueva)
+        print(f"\nVersión actualizada: {v_actual} → {v_nueva}")
+    else:
+        # Forzar la escritura si falta (ej. proyecto sin VERSION)
+        if not VERSION_FILE.exists():
+            actualizar_version(v_nueva)
+        print(f"\nVersión local: v{v_nueva}")
 
     print()
     print("INTACTO (trabajo activo no tocado):")
@@ -173,8 +206,12 @@ def main():
         print(f"  {p}: {estado}")
 
     print()
-    print(f"Migración completa. Sistema en v{v_nueva}.")
-    print("Backups en: sistema-ia/_backup_migracion/")
+    if not (act_scripts or rep_scripts or act_skills or rep_skills) and v_actual == v_nueva:
+        print(f"Ya en v{v_nueva} y completo. Nada que hacer.")
+    else:
+        print(f"Migración completa. Sistema en v{v_nueva}.")
+        if BACKUP_DIR.exists():
+            print(f"Backups en: {BACKUP_DIR.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

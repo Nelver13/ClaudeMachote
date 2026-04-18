@@ -2,22 +2,23 @@
 """
 auto_setup.py — Se ejecuta al abrir el proyecto (SessionStart hook).
 Detecta si el sistema ya está configurado. Si no → arranca setup automático.
+Detecta también si hay nueva versión del machote disponible.
 """
 import sys
 import json
+import subprocess
 from pathlib import Path
 from datetime import datetime
 
 ROOT = Path(__file__).parents[2]  # acciones → sistema-ia → raíz
+SIA = ROOT / "sistema-ia"
 ESTADO = ROOT / "ESTADO.md"
-SESIONES_DIR = ROOT / "sistema-ia" / "memoria" / "sesiones"
+SESIONES_DIR = SIA / "memoria" / "sesiones"
+VERSION_FILE = SIA / "VERSION"
 
 
 def proteger_gitignore():
-    """
-    Asegura que sistema-ia/ esté en .gitignore del proyecto.
-    Se ejecuta siempre al abrir — silencioso si ya está protegido.
-    """
+    """Asegura que sistema-ia/ esté en .gitignore del proyecto."""
     gitignore = ROOT / ".gitignore"
     lineas_requeridas = [
         "# Sistema IA — local only, nunca subir a git",
@@ -67,14 +68,66 @@ def leer_ultima_sesion() -> str:
     sesiones = sorted(SESIONES_DIR.glob("*.md"), reverse=True)
     if not sesiones:
         return ""
-    return sesiones[0].read_text(encoding="utf-8")[-500:]  # últimas 500 chars
+    return sesiones[0].read_text(encoding="utf-8")[-500:]
+
+
+def detectar_version_desfase() -> str | None:
+    """
+    Compara VERSION local con VERSION en origin/main del repo sistema-ia.
+    Devuelve string de aviso si hay desfase, o None en cualquier otro caso.
+    Silencioso si no hay git, red, o VERSION.
+    """
+    try:
+        if not VERSION_FILE.exists():
+            return None
+        local = VERSION_FILE.read_text(encoding="utf-8").strip()
+
+        # sistema-ia debe ser un repo git propio (clonado)
+        git_dir = SIA / ".git"
+        if not git_dir.exists():
+            return None
+
+        # fetch silencioso con timeout corto
+        try:
+            subprocess.run(
+                ["git", "-C", str(SIA), "fetch", "--quiet"],
+                timeout=5,
+                capture_output=True,
+                check=False,
+            )
+        except Exception:
+            return None
+
+        # leer VERSION remoto
+        try:
+            r = subprocess.run(
+                ["git", "-C", str(SIA), "show", "origin/main:VERSION"],
+                timeout=5,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if r.returncode != 0:
+                return None
+            remoto = r.stdout.strip()
+        except Exception:
+            return None
+
+        if not remoto or remoto == local:
+            return None
+
+        return (
+            f"⚠ ACTUALIZACIÓN DISPONIBLE — machote v{remoto} (local v{local}). "
+            f"Ejecuta: cd sistema-ia && git pull && cd .. && python sistema-ia/acciones/migrar.py"
+        )
+    except Exception:
+        return None
 
 
 def main():
-    proteger_gitignore()  # siempre — silencioso si ya está protegido
+    proteger_gitignore()
 
     if not proyecto_configurado():
-        # Proyecto recién clonado — necesita configuración
         output = {
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",
@@ -94,9 +147,9 @@ No hagas nada más hasta completar la configuración."""
             }
         }
     else:
-        # Proyecto ya configurado — carga contexto de la última sesión
         estado = leer_estado()
         ultima = leer_ultima_sesion()
+        aviso_version = detectar_version_desfase()
 
         proj    = estado.get("PROJ", "?")
         modulo  = estado.get("MODULO", "ninguno")
@@ -108,6 +161,7 @@ No hagas nada más hasta completar la configuración."""
         estado_plan= estado.get("ESTADO_PLAN", "")
 
         sesion_ctx = f"\nÚltima sesión:\n{ultima}" if ultima else ""
+        update_ctx = f"\n\n{aviso_version}\n" if aviso_version else ""
 
         output = {
             "hookSpecificOutput": {
@@ -117,7 +171,7 @@ Checkpoint: {checkpoint}
 Módulo: {modulo} | Plan: {plan} | Progreso: {progreso}
 Estado plan: {estado_plan}
 Último aviso: {last_aviso}
-Próxima tarea: {next_task}{sesion_ctx}
+Próxima tarea: {next_task}{sesion_ctx}{update_ctx}
 
 Lee INICIO.md → detecta tu rol → confirma con una línea y espera instrucciones."""
             }
