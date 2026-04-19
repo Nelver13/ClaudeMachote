@@ -71,6 +71,11 @@ Avisa final:
 python sistema-ia/acciones/avisar.py "Plan [modulo] completo — [N] tareas — revisa" normal
 ```
 
+**Comprime el contexto** (libera tokens para el siguiente módulo):
+```
+/compact
+```
+
 Di: "Listo — [N] tareas completadas — revisa."
 
 ---

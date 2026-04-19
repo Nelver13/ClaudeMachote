@@ -38,6 +38,10 @@ TÚ: "0" → ARQ crea plan + PROMPT_DEV. Avisa.
 ## Flujo completo
 
 ### Al recibir idea
+0. Si ESTADO.md tiene `[ESTADO_PLAN: Completado]` o `[ESTADO_PLAN: En revision]` → comprime contexto primero:
+```
+/compact
+```
 1. Crea `sistema-ia/discusiones/N-modulo/v1.md`
 2. Escribe contexto + primera pregunta (o propuestas con trade-offs si humano no sabe)
 3. Actualiza ESTADO.md:
