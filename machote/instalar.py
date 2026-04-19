@@ -1,76 +1,125 @@
 #!/usr/bin/env python3
 """
 instalar.py — Instala el sistema multi-IA en un proyecto.
-Copia todos los archivos del machote al proyecto destino.
+Los scripts ya viven en sistema-ia/acciones/ (directamente en git).
+Este script solo crea: archivos raíz, carpetas, .claude/settings.json en raíz del proyecto.
 
 Uso:
-  python instalar.py                        → instala en directorio actual
-  python instalar.py /ruta/a/mi-proyecto    → instala en ruta específica
+  python sistema-ia/machote/instalar.py            → instala en directorio actual
+  python sistema-ia/machote/instalar.py /ruta/     → instala en ruta específica
 """
 import sys
 import shutil
+import json
 from pathlib import Path
 
-MACHOTE_DIR = Path(__file__).parent
-ACCIONES_SRC = MACHOTE_DIR.parent / "sistema-ia" / ".claude" / "ia" / "acciones"
-SKILLS_SRC   = MACHOTE_DIR.parent / "sistema-ia" / ".claude" / "skills"
+MACHOTE_DIR = Path(__file__).parent   # sistema-ia/machote/
 
 
 def instalar(destino: Path):
     print(f"Instalando sistema-ia en: {destino}")
     print()
 
-    # 1. Archivos raíz
+    # 1. Archivos raíz (template del proyecto)
     raiz_files = ["INICIO.md", "AGENTS.md", "ESTADO.md",
                   "CLAUDE.md", "KIMI.md", "CODEX.md", "GEMINI.md"]
     for f in raiz_files:
         src = MACHOTE_DIR / f
         dst = destino / f
+        if not src.exists():
+            print(f"  SKIP (no en machote): {f}")
+            continue
         if dst.exists():
-            print(f"  SKIP (existe): {f}")
+            print(f"  SKIP (ya existe): {f}")
         else:
             shutil.copy2(src, dst)
             print(f"  OK: {f}")
 
-    # 2. estructura sistema-ia/
-    carpetas = ["planes", "discusiones", "memoria", "handoff", "acciones"]
-    for c in carpetas:
+    # 2. Carpetas sistema-ia/
+    for c in ["planes", "discusiones", "memoria/sesiones", "handoff", "logs"]:
         (destino / "sistema-ia" / c).mkdir(parents=True, exist_ok=True)
+    print("  OK: carpetas sistema-ia/")
 
-    # 3. Copiar acciones (scripts)
-    if ACCIONES_SRC.exists():
-        for script in ACCIONES_SRC.iterdir():
-            dst = destino / "sistema-ia" / "acciones" / script.name
-            if not dst.exists():
-                shutil.copy2(script, dst)
-                print(f"  OK: sistema-ia/acciones/{script.name}")
-    else:
-        print("  AVISO: No se encontró carpeta de acciones en el machote.")
-
-    # 4. .claude/settings.json
-    claude_dir = destino / "sistema-ia" / ".claude"
+    # 3. .claude/settings.json en raíz del PROYECTO (no en sistema-ia/)
+    #    Los hooks usan rutas relativas a la raíz del proyecto.
+    claude_dir = destino / ".claude"
     claude_dir.mkdir(parents=True, exist_ok=True)
-    settings_src = MACHOTE_DIR / "sistema-ia" / ".claude" / "settings.json"
     settings_dst = claude_dir / "settings.json"
-    if not settings_dst.exists():
-        shutil.copy2(settings_src, settings_dst)
-        print(f"  OK: sistema-ia/.claude/settings.json")
 
-    # 5. Skills
-    if SKILLS_SRC.exists():
-        skills_dst = claude_dir / "skills"
-        if not skills_dst.exists():
-            shutil.copytree(SKILLS_SRC, skills_dst)
-            print(f"  OK: sistema-ia/.claude/skills/")
+    settings = {
+        "permissions": {
+            "defaultMode": "acceptEdits",
+            "allow": [
+                "Bash(python*)",
+                "Bash(python3*)",
+                "Read(**)",
+                "Write(sistema-ia/**)",
+                "Write(discusiones/**)",
+                "Write(planes/**)",
+                "Write(memoria/**)",
+                "Edit(sistema-ia/**)",
+                "Edit(discusiones/**)",
+                "Edit(planes/**)",
+                "Edit(memoria/**)",
+                "Edit(ESTADO.md)",
+                "Edit(INICIO.md)",
+                "Edit(AGENTS.md)",
+                "Glob(**)",
+                "Grep(**)"
+            ]
+        },
+        "hooks": {
+            "SessionStart": [
+                {
+                    "hooks": [
+                        {
+                            "type": "command",
+                            "command": "python sistema-ia/acciones/auto_setup.py"
+                        }
+                    ]
+                }
+            ],
+            "PreToolUse": [
+                {
+                    "matcher": "Edit|Write",
+                    "hooks": [
+                        {
+                            "type": "command",
+                            "command": "python sistema-ia/acciones/check_role.py"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+    if not settings_dst.exists():
+        settings_dst.write_text(
+            json.dumps(settings, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
+        print(f"  OK: .claude/settings.json")
     else:
-        print("  AVISO: No se encontró carpeta de skills.")
+        print(f"  SKIP (ya existe): .claude/settings.json")
+
+    # 4. Scripts — ya están en sistema-ia/acciones/ (git los trae directamente)
+    acciones_dir = destino / "sistema-ia" / "acciones"
+    n_scripts = len(list(acciones_dir.glob("*.py"))) if acciones_dir.exists() else 0
+    print(f"  OK: sistema-ia/acciones/ — {n_scripts} scripts (git-tracked)")
+
+    # 5. VERSION
+    version_src = MACHOTE_DIR.parent / "VERSION"
+    version_dst = destino / "sistema-ia" / "VERSION"
+    if version_src.exists() and not version_dst.exists():
+        shutil.copy2(version_src, version_dst)
+        print(f"  OK: sistema-ia/VERSION")
 
     print()
     print("Listo. Próximos pasos:")
-    print("  1. Edita ESTADO.md → pon nombre del proyecto y roles de IAs")
+    print("  1. Edita ESTADO.md → nombre del proyecto y roles")
     print("  2. Edita CLAUDE.md / KIMI.md etc. → reemplaza NOMBRE_PROYECTO")
-    print("  3. Pega INICIO.md en la IA que vas a usar")
-    print("  4. Configura credenciales en sistema-ia/acciones/credenciales.md")
+    print("  3. Configura sistema-ia/acciones/credenciales.md (ntfy/webhook)")
+    print("  4. Abre Claude Code — auto_setup.py carga el contexto solo")
 
 
 def main():

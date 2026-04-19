@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.4 — 2026-04-18
+### Reestructura (Fix B) — git pull ahora actualiza scripts directamente
+- Scripts movidos a `acciones/` en la raíz del repo. Al clonar como `sistema-ia/`, quedan en `sistema-ia/acciones/` — directamente en git. `git pull` en `sistema-ia/` los actualiza sin pasos extra.
+- Skills movidas a `.claude/skills/` en la raíz del repo (mismo principio).
+- `migrar.py` simplificado: ya no copia scripts, solo crea carpetas faltantes y limpia pre-v2.0.
+- `instalar.py` reescrito: pone `.claude/settings.json` en raíz del PROYECTO (no en sistema-ia/), no copia scripts (ya están en git).
+- `auto_setup.py` y todos los scripts usan búsqueda robusta de raíz (search-upward por ESTADO.md) en lugar de `parents[N]` hardcodeado.
+- `detectar_version_desfase()`: mensaje simplificado — solo dice `git pull`, no `migrar.py` (ya no es necesario para scripts).
+
+---
+
 ## v2.3 — 2026-04-18
 ### Corregido (bloqueadores reportados en proyectos reales)
 - **Arquitecto saltaba directo a dev sin generar plan ni PROMPT_DEV.** Paso `0` del modo-arquitecto ahora valida en disco que el plan exista y que `finalizar_discusion.py` haya generado `handoff/[modulo].json` antes de cambiar `[ESTADO_PLAN: Listo para dev]`. Si algún paso falla → avisa urgente y PARA.
