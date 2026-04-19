@@ -73,8 +73,8 @@ def main():
     else:
         print("Carpetas: OK")
 
-    print("Scripts: en git — actualizados vía 'cd sistema-ia && git pull' ✓")
-    print("Skills:  en git — actualizadas vía 'cd sistema-ia && git pull' ✓")
+    print("Scripts: en git -- actualizados via 'cd sistema-ia && git pull' OK")
+    print("Skills:  en git -- actualizadas via 'cd sistema-ia && git pull' OK")
 
     print()
     print("INTACTO:")
