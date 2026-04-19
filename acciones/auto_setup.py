@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
 auto_setup.py — SessionStart hook.
-Detecta si el proyecto está configurado. Si no → arranca setup.
-Detecta versión nueva en git remoto y avisa.
-
-Fix B: Scripts en acciones/ a raíz del repo — git pull los actualiza directo.
+- Detecta si el proyecto esta configurado.
+- Si hay version nueva: hace git pull automatico + lee NOVEDADES.md
+- Inyecta instrucciones de actualizacion para que la IA las ejecute sola.
 """
 import sys
 import json
@@ -22,20 +21,21 @@ def _encontrar_raiz() -> Path:
         if actual.parent == actual:
             break
         actual = actual.parent
-    return Path(__file__).parents[2]  # fallback
+    return Path(__file__).parents[2]
 
 
-ROOT = _encontrar_raiz()
-SIA = ROOT / "sistema-ia"
-ESTADO = ROOT / "ESTADO.md"
+ROOT         = _encontrar_raiz()
+SIA          = ROOT / "sistema-ia"
+ESTADO       = ROOT / "ESTADO.md"
 SESIONES_DIR = SIA / "memoria" / "sesiones"
 VERSION_FILE = SIA / "VERSION"
+NOVEDADES    = SIA / "NOVEDADES.md"
 
 
 def proteger_gitignore():
     gitignore = ROOT / ".gitignore"
     lineas_requeridas = [
-        "# Sistema IA — local only, nunca subir a git",
+        "# Sistema IA -- local only, nunca subir a git",
         "sistema-ia/",
         "INICIO.md",
         "AGENTS.md",
@@ -83,17 +83,24 @@ def leer_ultima_sesion() -> str:
     return sesiones[0].read_text(encoding="utf-8")[-500:]
 
 
-def detectar_version_desfase() -> str | None:
-    """Compara VERSION local vs origin/main. Silencioso si falla."""
+def auto_actualizar() -> str | None:
+    """
+    Si hay version nueva en origin:
+    1. Hace git pull automatico en sistema-ia/
+    2. Lee NOVEDADES.md
+    3. Devuelve las instrucciones para que la IA las ejecute.
+    Silencioso si no hay red, git, o VERSION.
+    """
     try:
         if not VERSION_FILE.exists():
             return None
-        local = VERSION_FILE.read_text(encoding="utf-8").strip()
-
         git_dir = SIA / ".git"
         if not git_dir.exists():
             return None
 
+        local = VERSION_FILE.read_text(encoding="utf-8").strip()
+
+        # Fetch silencioso
         try:
             subprocess.run(
                 ["git", "-C", str(SIA), "fetch", "--quiet"],
@@ -102,6 +109,7 @@ def detectar_version_desfase() -> str | None:
         except Exception:
             return None
 
+        # Leer VERSION remota
         try:
             r = subprocess.run(
                 ["git", "-C", str(SIA), "show", "origin/main:VERSION"],
@@ -116,10 +124,35 @@ def detectar_version_desfase() -> str | None:
         if not remoto or remoto == local:
             return None
 
-        return (
-            f"⚠ ACTUALIZACIÓN — machote v{remoto} disponible (local v{local}). "
-            f"Ejecuta: cd sistema-ia && git pull"
-        )
+        # Hay version nueva — hacer pull automatico
+        try:
+            pull = subprocess.run(
+                ["git", "-C", str(SIA), "pull", "--ff-only", "--quiet"],
+                timeout=15, capture_output=True, text=True, check=False,
+            )
+            pull_ok = pull.returncode == 0
+        except Exception:
+            pull_ok = False
+
+        if not pull_ok:
+            return (
+                f"ACTUALIZACION DISPONIBLE v{remoto} (local v{local}) — "
+                f"pull fallo, ejecuta manualmente: cd sistema-ia && git pull"
+            )
+
+        # Pull exitoso — leer NOVEDADES.md
+        novedades_txt = ""
+        if NOVEDADES.exists():
+            novedades_txt = NOVEDADES.read_text(encoding="utf-8")
+
+        bloque = f"SISTEMA-IA ACTUALIZADO v{local} -> v{remoto}\n"
+        if novedades_txt:
+            bloque += f"\nINSTRUCCIONES DE ACTUALIZACION — ejecuta esto AHORA antes de continuar:\n\n{novedades_txt}"
+        else:
+            bloque += "\nNo hay instrucciones de actualizacion pendientes."
+
+        return bloque
+
     except Exception:
         return None
 
@@ -131,21 +164,21 @@ def main():
         output = {
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",
-                "additionalContext": """SISTEMA-IA: Proyecto recién clonado o no configurado.
+                "additionalContext": """SISTEMA-IA: Proyecto recien clonado o no configurado.
 
-ACCIÓN REQUERIDA:
+ACCION REQUERIDA:
 1. Pregunta (UNA por UNA): nombre del proyecto, stack, IAs, rol de cada una
 2. Actualiza ESTADO.md
 3. Actualiza CLAUDE.md/KIMI.md/etc
-4. Avisa: "Listo — [proyecto] configurado"
+4. Avisa: "Listo -- [proyecto] configurado"
 
-No hagas nada más hasta completar la configuración."""
+No hagas nada mas hasta completar la configuracion."""
             }
         }
     else:
-        estado = leer_estado()
-        ultima = leer_ultima_sesion()
-        aviso_version = detectar_version_desfase()
+        estado       = leer_estado()
+        ultima       = leer_ultima_sesion()
+        actualizacion = auto_actualizar()
 
         proj       = estado.get("PROJ", "?")
         modulo     = estado.get("MODULO", "ninguno")
@@ -156,20 +189,20 @@ No hagas nada más hasta completar la configuración."""
         next_task  = estado.get("NEXT_TASK", "ninguno")
         estado_plan= estado.get("ESTADO_PLAN", "")
 
-        sesion_ctx = f"\nÚltima sesión:\n{ultima}" if ultima else ""
-        update_ctx = f"\n\n{aviso_version}" if aviso_version else ""
+        sesion_ctx  = f"\nUltima sesion:\n{ultima}" if ultima else ""
+        update_ctx  = f"\n\n{'='*50}\n{actualizacion}\n{'='*50}" if actualizacion else ""
 
         output = {
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",
-                "additionalContext": f"""SISTEMA-IA CARGADO — {proj}
+                "additionalContext": f"""SISTEMA-IA CARGADO -- {proj}
 Checkpoint: {checkpoint}
-Módulo: {modulo} | Plan: {plan} | Progreso: {progreso}
+Modulo: {modulo} | Plan: {plan} | Progreso: {progreso}
 Estado plan: {estado_plan}
-Último aviso: {last_aviso}
-Próxima tarea: {next_task}{sesion_ctx}{update_ctx}
+Ultimo aviso: {last_aviso}
+Proxima tarea: {next_task}{sesion_ctx}{update_ctx}
 
-Lee INICIO.md → detecta tu rol → confirma con una línea y espera instrucciones."""
+Lee INICIO.md -> detecta tu rol -> confirma con una linea y espera instrucciones."""
             }
         }
 
