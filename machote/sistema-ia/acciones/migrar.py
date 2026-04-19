@@ -100,10 +100,13 @@ def limpiar_viejos():
     return movidos
 
 
+ESTE_SCRIPT = Path(__file__).resolve()
+
 def sincronizar_archivos(src_dir: Path, dst_dir: Path, nombres: list, tag: str):
     """
     Copia cada nombre de src_dir → dst_dir. Si dst existe, backup + sobrescribe.
     Si dst no existe, lo replenece. Devuelve (actualizados, replenecidos).
+    Salta migrar.py si coincide con el script en ejecución (no se puede sobreescribir en Windows).
     """
     dst_dir.mkdir(parents=True, exist_ok=True)
     actualizados = []
@@ -111,6 +114,10 @@ def sincronizar_archivos(src_dir: Path, dst_dir: Path, nombres: list, tag: str):
     for nombre in nombres:
         src = src_dir / nombre
         dst = dst_dir / nombre
+        # No sobreescribir el script que está corriendo ahora mismo
+        if dst.resolve() == ESTE_SCRIPT:
+            print(f"  [skip] {nombre} — en uso, actualízalo manualmente si cambia")
+            continue
         if not src.exists():
             continue
         if dst.exists():
