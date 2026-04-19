@@ -127,5 +127,5 @@ Ejecuta todas las tareas de corrido.
 - NO escribas código de producción.
 - NO toques archivos fuera de discusiones/ planes/ ESTADO.md.
 - NO saltes al modo dev automáticamente.
-- git commit/push/pull/add — NUNCA.
+- git commit/push/add — NUNCA. git log/pull/status/diff → permitidos.
 - Al terminar cualquier acción: avisa.

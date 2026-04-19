@@ -127,11 +127,22 @@ Al terminar sesión: `python sistema-ia/acciones/cerrar_sesion.py [modulo] [resu
 
 ---
 
-## GIT — PROHIBIDO SIEMPRE
+## GIT — REGLAS
 
 ```
-git log / commit / push / pull / add / stash / reset — NUNCA
-git status → único permitido
+✅ PERMITIDO:
+git status        ← ver estado
+git log           ← ver historial
+git pull          ← actualizar (solo en sistema-ia/)
+git diff          ← ver cambios
+
+❌ PROHIBIDO SIEMPRE:
+git commit        ← solo el humano
+git push          ← solo el humano
+git add           ← solo el humano
+git stash         ← prohibido
+git reset         ← prohibido
+git rebase        ← prohibido
 ```
 
-Solo el humano gestiona git.
+El humano hace commit, add y push. La IA puede leer historial y actualizar sistema-ia/.

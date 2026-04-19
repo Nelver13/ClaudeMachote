@@ -92,4 +92,4 @@ python sistema-ia/acciones/avisar.py "BLOQUEADO: [desc exacta] en [archivo]" urg
 ## Reglas
 - NO diseñes. NO propongas cambios al plan.
 - NO preguntes entre tareas salvo bloqueo absoluto.
-- git commit/push/pull/add — NUNCA.
+- git commit/push/add — NUNCA. git log/pull/status/diff → permitidos.
