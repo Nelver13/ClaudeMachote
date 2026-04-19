@@ -114,8 +114,14 @@ def instalar(destino: Path):
         shutil.copy2(version_src, version_dst)
         print(f"  OK: sistema-ia/VERSION")
 
+    # 6. Borrar machote/ — ya no se necesita, solo genera ruido
+    machote_dst = destino / "sistema-ia" / "machote"
+    if machote_dst.exists():
+        shutil.rmtree(machote_dst)
+        print("  OK: sistema-ia/machote/ eliminado (ya no se necesita)")
+
     print()
-    print("Listo. Próximos pasos:")
+    print("Listo. Proximos pasos:")
     print("  1. Edita ESTADO.md → nombre del proyecto y roles")
     print("  2. Edita CLAUDE.md / KIMI.md etc. → reemplaza NOMBRE_PROYECTO")
     print("  3. Configura sistema-ia/acciones/credenciales.md (ntfy/webhook)")

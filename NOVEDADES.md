@@ -1,22 +1,22 @@
 # NOVEDADES — Instrucciones de actualización para la IA
 > auto_setup.py inyecta este archivo cuando detecta version nueva.
-> La IA ejecuta las instrucciones de la version instalada.
-> REGLA: ejecutar TODO en orden. No saltarse pasos. No tocar lo que dice "NO TOCAR".
+> NOTA: machote/ se borra automaticamente despues del pull — las instrucciones
+> deben tener el contenido exacto inline, sin referenciar sistema-ia/machote/.
 
 ---
 
 ## REGLAS GENERALES (aplican a todas las versiones)
 
 ### NUNCA tocar:
-- ESTADO.md — tiene el estado actual del proyecto
-- planes/ discusiones/ memoria/ handoff/ — trabajo activo
-- El nombre del proyecto, stack, roles configurados
+- ESTADO.md
+- planes/ discusiones/ memoria/ handoff/
+- Nombre del proyecto, stack, roles configurados
 - Codigo de produccion del proyecto
 
 ### SIEMPRE antes de editar un .md del proyecto:
 1. Leer el archivo completo primero
-2. Aplicar SOLO lo que dice la instruccion — nada mas
-3. Si el contenido ya existe → saltar ese paso (no duplicar)
+2. Aplicar SOLO lo que dice la instruccion
+3. Si el contenido ya existe → saltar (no duplicar)
 4. Si tienes duda → avisar urgente y parar
 
 ### Al terminar todas las instrucciones:
@@ -28,32 +28,64 @@ python sistema-ia/acciones/avisar.py "Proyecto actualizado a v[X.Y]" normal
 
 ## v2.5
 
-### Que cambio en esta version
-- auto_setup.py hace git pull automatico al detectar version nueva
-- NOVEDADES.md da instrucciones automaticas a la IA
-- /compact se ejecuta al terminar plan y al empezar modulo nuevo
+### Que cambio
+- auto_setup.py hace git pull automatico y lee este archivo
+- machote/ se borra automaticamente despues de instalar/actualizar
+- /compact al terminar plan y al empezar modulo nuevo
+- git log/pull/diff permitidos — solo commit/push/add prohibidos
 
 ### Instrucciones para la IA:
 
-**1. Verificar seccion de ahorro en AGENTS.md**
-- Lee AGENTS.md del proyecto (raiz)
-- Busca la primera seccion despues del titulo
-- Si dice `MODO CAVEMAN (siempre activo)` → reemplaza esa seccion entera con el contenido de `sistema-ia/machote/AGENTS.md` seccion `AHORRO DE TOKENS`
-- Si ya dice `AHORRO DE TOKENS` → OK, no hacer nada
+**1. Verificar seccion GIT en AGENTS.md**
+Lee AGENTS.md. Busca la seccion GIT.
+Si dice solo `git status → unico permitido` → reemplaza esa seccion con esto:
+
+```
+## GIT — REGLAS
+
+✅ PERMITIDO:
+git status / git log / git pull / git diff
+
+❌ PROHIBIDO SIEMPRE:
+git commit / git push / git add / git stash / git reset / git rebase
+
+El humano hace commit, add y push. La IA puede leer historial y actualizar sistema-ia/.
+```
+
+Si ya tiene esa estructura → OK, no tocar.
 
 **2. Verificar INICIO.md**
-- Si no existe INICIO.md en la raiz del proyecto → copia `sistema-ia/machote/INICIO.md` → `INICIO.md`
-- Si ya existe → compara con `sistema-ia/machote/INICIO.md`
-- Si el existente tiene menos de 20 lineas y el machote tiene mas → reemplaza
-- Si el existente tiene datos del proyecto → no tocar
+Si no existe INICIO.md en la raiz → copia el contenido de abajo como INICIO.md:
 
-**3. Verificar hooks en .claude/settings.json**
-- Lee `.claude/settings.json` del proyecto
-- Debe tener `SessionStart` con comando `python sistema-ia/acciones/auto_setup.py`
-- Debe tener `PreToolUse` con matcher `Edit|Write` y comando `python sistema-ia/acciones/check_role.py`
-- Si faltan → agrega. Si ya estan → OK
+```
+# INICIO — Lee esto primero
 
-**4. Avisar**
+Lee ESTADO.md → detecta tu rol → actua.
+
+## Si eres ARQUITECTO
+- Debate en archivo discusiones/N-modulo/v1.md — NO en el chat
+- Chat solo: idea / 1 (feedback) / 0 (aprobar)
+- Al terminar: python sistema-ia/acciones/finalizar_discusion.py [modulo] [version]
+- NO escribas codigo. NO toques archivos fuera de discusiones/planes/ESTADO.md.
+
+## Si eres DEV
+- Lee el plan COMPLETO antes de empezar
+- Ejecuta TODAS las tareas seguidas, sin pedir permiso
+- Marca [x] por tarea, actualiza ESTADO.md
+- Al terminar: python sistema-ia/acciones/finalizar_plan.py [modulo] [version]
+
+## Avisos (obligatorio)
+python sistema-ia/acciones/avisar.py "mensaje" suave|normal|urgente
+
+## Prohibido siempre
+- git commit / push / add
+- Secrets en codigo
+- Continuar sin avisar al terminar
+```
+
+Si ya existe INICIO.md → OK, no tocar.
+
+**3. Avisar**
 ```bash
 python sistema-ia/acciones/avisar.py "Proyecto actualizado a v2.5" normal
 ```
@@ -62,20 +94,18 @@ python sistema-ia/acciones/avisar.py "Proyecto actualizado a v2.5" normal
 
 ## PLANTILLA para versiones futuras
 
-Cuando hagas una nueva version copia esto y llena:
-
 ```markdown
 ## vX.Y
 
-### Que cambio en esta version
+### Que cambio
 - [descripcion corta]
 
 ### Instrucciones para la IA:
 
-**1. [Nombre del paso]**
+**1. [Paso]**
 - Lee [archivo]
-- Si [condicion] → [accion exacta]
-- Si ya esta → OK, no hacer nada
+- Si [condicion] → [accion con contenido INLINE, no referenciar machote/]
+- Si ya esta → OK
 
 **2. Avisar**
 python sistema-ia/acciones/avisar.py "Proyecto actualizado a vX.Y" normal

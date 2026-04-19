@@ -136,9 +136,18 @@ def auto_actualizar() -> str | None:
 
         if not pull_ok:
             return (
-                f"ACTUALIZACION DISPONIBLE v{remoto} (local v{local}) — "
+                f"ACTUALIZACION DISPONIBLE v{remoto} (local v{local}) -- "
                 f"pull fallo, ejecuta manualmente: cd sistema-ia && git pull"
             )
+
+        # Pull exitoso — borrar machote/ (solo ruido durante el trabajo)
+        try:
+            import shutil
+            machote_dir = SIA / "machote"
+            if machote_dir.exists():
+                shutil.rmtree(machote_dir)
+        except Exception:
+            pass
 
         # Pull exitoso — leer NOVEDADES.md
         novedades_txt = ""
