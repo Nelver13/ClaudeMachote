@@ -1,105 +1,103 @@
-# PROMPT DE MIGRACIÓN — Actualizar sistema IA existente
-> Pega esto a cualquier IA (Claude, Kimi, Codex, Gemini) cuando el proyecto ya tiene sistema-ia/ instalado.
-> Este prompt sirve tanto para actualizar una version vieja como para recuperar un sistema roto.
+# PROMPT DE MIGRACIÓN / ACTUALIZACIÓN — Sistema IA
+> Pega esto a cualquier IA (Claude, Kimi, Codex, Gemini, Antigraviton, etc.)
+> Sirve para: actualizar version vieja, recuperar sistema roto, o sincronizar cambios nuevos.
 
 ---
 
 ```
-Vas a actualizar el sistema IA de este proyecto a la version mas reciente.
-Sigue los pasos EN ORDEN. No saltes ninguno. Lee completo antes de empezar.
+Vas a actualizar el sistema IA de este proyecto. git@github.com:Nelver13/ClaudeMachote.git
+Lee TODO antes de empezar. Sigue el orden exacto.
 
-== REGLAS DE SEGURIDAD — LEE PRIMERO ==
-NUNCA tocar:
-- ESTADO.md (tiene el estado actual del proyecto)
-- planes/ discusiones/ memoria/ handoff/ (trabajo activo)
+== REGLAS — NUNCA TOCAR ==
+- ESTADO.md
+- planes/ discusiones/ memoria/ handoff/
 - Codigo de produccion del proyecto
-- El nombre del proyecto, stack, roles ya configurados
-Si algo no esta claro → avisa urgente y para. No adivines.
+- Nombre del proyecto, stack, roles configurados
+Si tienes duda → para y avisa. No adivines.
 
-== PASO 1 — Verificar estado actual ==
-Ejecuta:
-  python sistema-ia/acciones/migrar.py
-
-Si da error "No such file" → el sistema esta roto, ir al PASO 1B.
-Si corre bien → continuar al PASO 2.
-
-== PASO 1B — Sistema roto (solo si migrar.py no existe) ==
-Ejecuta en PowerShell:
-  Rename-Item sistema-ia\acciones sistema-ia\acciones_old
-  cd sistema-ia
-  git checkout acciones/migrar.py
-  cd ..
-  python sistema-ia/acciones/migrar.py
-
-== PASO 2 — Actualizar scripts y skills via git ==
+== PASO 1 — git pull en sistema-ia/ ==
 Ejecuta:
   cd sistema-ia
-  git checkout acciones/migrar.py
   git pull
   cd ..
 
-Si git pull da error de merge en algun archivo:
+Esto actualiza automaticamente:
+  sistema-ia/acciones/     ← todos los scripts (avisar, finalizar_plan, etc.)
+  sistema-ia/.claude/skills/ ← skills modo-arquitecto, modo-dev, caveman
+
+Si git pull da error de merge:
+  cd sistema-ia
   git checkout [archivo-con-conflicto]
   git pull
+  cd ..
 
-== PASO 3 — Verificar que los scripts llegaron ==
+Si acciones/ no existe o esta vacio (sistema roto):
+  cd sistema-ia
+  git checkout acciones/migrar.py
+  cd ..
+  python sistema-ia/acciones/migrar.py
+  → luego volver al PASO 1
+
+== PASO 2 — Verificar que los scripts funcionan ==
 Ejecuta:
-  python sistema-ia/acciones/avisar.py "test migracion" suave
+  python sistema-ia/acciones/avisar.py "test actualizacion" suave
 
-Debe sonar + popup en Windows. Si no funciona → avisa urgente con el error exacto.
+Debe sonar + popup. Si falla → avisa con el error exacto y para.
 
-== PASO 4 — Verificar .claude/settings.json ==
-Lee el archivo .claude/settings.json en la raiz del proyecto.
-Debe tener:
-- SessionStart hook: python sistema-ia/acciones/auto_setup.py
-- PreToolUse hook: python sistema-ia/acciones/check_role.py
+== PASO 3 — Verificar .claude/settings.json en raiz del PROYECTO ==
+Lee .claude/settings.json (en la raiz del proyecto, NO en sistema-ia/).
 
-Si no existe .claude/settings.json → ejecuta:
-  python sistema-ia/machote/instalar.py
+Debe contener exactamente esto:
+{
+  "permissions": { "defaultMode": "acceptEdits", "allow": ["Bash(python*)", "Read(**)", "Glob(**)", "Grep(**)", ...] },
+  "hooks": {
+    "SessionStart": [{"hooks": [{"type": "command", "command": "python sistema-ia/acciones/auto_setup.py"}]}],
+    "PreToolUse": [{"matcher": "Edit|Write", "hooks": [{"type": "command", "command": "python sistema-ia/acciones/check_role.py"}]}]
+  }
+}
 
-Si existe pero le faltan los hooks → agrega solo los que falten, no reemplaces el archivo.
+Si no existe .claude/settings.json en la raiz → crealo con ese contenido.
+Si existe pero le faltan los hooks → agrega solo los que falten.
 
-== PASO 5 — Aplicar NOVEDADES.md ==
+== PASO 4 — Leer y aplicar NOVEDADES.md ==
 Lee sistema-ia/NOVEDADES.md completo.
-Ejecuta las instrucciones de la version mas reciente que aparece en ese archivo.
-Sigue las reglas de seguridad de ese archivo (no tocar ESTADO.md, planes, etc.).
+Aplica las instrucciones de la version mas reciente.
+El archivo dice exactamente que tocar y que no.
 
-== PASO 6 — Verificar archivos raiz del proyecto ==
-Compara cada archivo con su template en sistema-ia/machote/:
-  CLAUDE.md    → compara con sistema-ia/machote/CLAUDE.md
-  AGENTS.md    → compara con sistema-ia/machote/AGENTS.md
-  INICIO.md    → compara con sistema-ia/machote/INICIO.md
-  KIMI.md      → compara con sistema-ia/machote/KIMI.md (si usa Kimi)
-  CODEX.md     → compara con sistema-ia/machote/CODEX.md (si usa Codex)
-  GEMINI.md    → compara con sistema-ia/machote/GEMINI.md (si usa Gemini)
+== PASO 5 — Verificar archivos raiz del proyecto ==
+Verifica que existen estos archivos en la raiz del proyecto:
+  INICIO.md / AGENTS.md / ESTADO.md / CLAUDE.md (o el .md de la IA que uses)
 
-Para cada archivo:
-- Si el proyecto tiene datos especificos (nombre, stack, roles) → conservarlos
-- Si el template tiene secciones nuevas que no existen en el proyecto → agregarlas
-- Si el template tiene secciones mejoradas → reemplazar SOLO esa seccion
-- No borrar nada que sea especifico del proyecto
+Para cada uno que exista:
+- Lee el archivo del proyecto
+- Lee la VERSION de git: git -C sistema-ia show HEAD:machote/[archivo]
+- Si el template tiene secciones que NO estan en el proyecto → agregarlas
+- Si el proyecto tiene datos especificos (nombre, stack, roles, historial) → conservarlos
+- NO borrar nada especifico del proyecto
+- Si el archivo no existe en el proyecto → crearlo con el contenido del template
 
-== PASO 7 — Confirmar ESTADO.md intacto ==
-Lee ESTADO.md y confirma que tiene:
-- [PROJ: nombre-del-proyecto] (no NOMBRE_PROYECTO)
+== PASO 6 — Confirmar ESTADO.md intacto ==
+Lee ESTADO.md. Verifica:
+- [PROJ: nombre] (no dice NOMBRE_PROYECTO)
 - Roles configurados
-- Modulo y plan actuales (si habia uno activo)
-
+- Plan activo intacto (si habia uno)
 Si algo esta mal → avisame antes de corregir.
 
-== PASO 8 — Avisar ==
-python sistema-ia/acciones/avisar.py "Sistema IA actualizado — revision completa OK" normal
+== PASO 7 — Avisar ==
+python sistema-ia/acciones/avisar.py "Sistema IA actualizado OK" normal
 
-== PASO 9 — Reportar ==
-Di en una sola respuesta corta:
+== PASO 8 — Reportar en una sola respuesta ==
 - Version instalada
-- Que se actualizo
-- Si habia plan activo: confirmar que sigue intacto
-- Si encontraste algo raro: mencionarlo
+- Que se actualizo (scripts, skills, archivos .md)
+- Plan activo: intacto o no
+- Algo raro que encontraste
 
-Reglas desde ya:
-- Sin saludos ni relleno. Respuestas cortas.
-- Una pregunta a la vez si necesitas aclarar algo.
-- git commit/push/pull/add — NUNCA. Solo el humano toca git.
-- Si un paso falla → avisa urgente con el error exacto y para.
+== REGLAS GIT ==
+✅ Permitido: git status / git log / git pull / git diff
+❌ Prohibido: git commit / git push / git add / git stash / git reset
+El humano hace commit y push. Tu solo jalas.
+
+== SI ALGO FALLA ==
+python sistema-ia/acciones/avisar.py "ERROR: [descripcion exacta]" urgente
+Para. No continues hasta que el humano responda.
 ```
