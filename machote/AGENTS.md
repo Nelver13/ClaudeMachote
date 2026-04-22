@@ -56,11 +56,11 @@ El debate ocurre EN EL ARCHIVO, no en el chat.
 ```
 CHAT                     ARCHIVO discusiones/N-modulo/vN.md
 ────────────             ──────────────────────────────────
-TÚ: "idea X"    →        Arquitecto crea archivo + preguntas. Avisa.
-TÚ: escribe feedback en el archivo
-TÚ: "1"         →        Arquitecto procesa feedback, actualiza. Avisa.
+TÚ: "idea X"    →        Arquitecto crea archivo + preguntas. Avisa con script.
+TÚ: escribe feedback en cualquier parte del archivo usando "r/ mis notas"
+TÚ: "1"         →        Arquitecto USA SUS TOOLS para leer todo el archivo, buscar todos los "r/", actualizar el documento y OBLIGATORIAMENTE ejecutar script de aviso.
 (repite hasta listo)
-TÚ: "0"         →        Arquitecto crea plan + PROMPT_DEV. Avisa.
+TÚ: "0"         →        Arquitecto crea plan + PROMPT_DEV usando tools. Avisa.
 ```
 
 **Comportamiento del debate:**
@@ -129,6 +129,10 @@ Al terminar sesión: `python sistema-ia/acciones/cerrar_sesion.py [modulo] [resu
 
 ## GIT — REGLAS
 
+**Arquitectura de Repositorio (GITIGNORE):**
+- **SÍ SE SUBE (Público para el equipo):** `ESTADO.md`, `sistema-ia/discusiones/` y `sistema-ia/planes/`. Estas carpetas **deben rastrearse en Git** para auditorías IA, sincronización de equipo, y especulación de tiempos o contratiempos. Constituyen la "verdad absoluta" del avance del sistema.
+- **SE IGNORA (Local del Dev):** Scripts (`sistema-ia/acciones/`), memoria, logs, credenciales y archivos base (`AGENTS.md`, `INICIO.md`). Se mantienen locales para no generar ruido y proteger la configuración privada del desarrollador.
+
 ```
 ✅ PERMITIDO:
 git status        ← ver estado
@@ -145,4 +149,4 @@ git reset         ← prohibido
 git rebase        ← prohibido
 ```
 
-El humano hace commit, add y push. La IA puede leer historial y actualizar sistema-ia/.
+El humano hace commit, add y push. La IA puede leer historial e inferir el avance apoyándose siempre en `ESTADO.md` y las discusiones/planes oficiales.

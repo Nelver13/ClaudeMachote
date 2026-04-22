@@ -166,8 +166,20 @@ def auto_actualizar() -> str | None:
         return None
 
 
+def limpiar_machote():
+    """Borra sistema-ia/machote/ si existe — siempre, no solo al actualizar."""
+    try:
+        import shutil
+        machote_dir = SIA / "machote"
+        if machote_dir.exists():
+            shutil.rmtree(machote_dir)
+    except Exception:
+        pass
+
+
 def main():
     proteger_gitignore()
+    limpiar_machote()
 
     if not proyecto_configurado():
         output = {

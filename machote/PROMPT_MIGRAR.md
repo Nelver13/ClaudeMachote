@@ -20,9 +20,10 @@ Ejecuta:
   cd sistema-ia
   git pull
   cd ..
+  python sistema-ia/acciones/migrar.py
 
 Esto actualiza automaticamente:
-  sistema-ia/acciones/     ← todos los scripts (avisar, finalizar_plan, etc.)
+  sistema-ia/acciones/     ← todos los scripts (incluyendo el .gitignore automático)
   sistema-ia/.claude/skills/ ← skills modo-arquitecto, modo-dev, caveman
 
 Si git pull da error de merge:

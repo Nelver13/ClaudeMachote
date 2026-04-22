@@ -164,6 +164,48 @@ def actualizar_version(nueva: str):
     VERSION_FILE.write_text(nueva + "\n", encoding="utf-8")
 
 
+def configurar_gitignore():
+    gitignore_dst = ROOT / ".gitignore"
+    gitignore_rules = """
+# ── Sistema IA (Generado) ───────────────────────────────
+# Ocultar scripts y memoria, pero mantener discusiones y planes para el equipo
+sistema-ia/*
+!sistema-ia/discusiones/
+!sistema-ia/planes/
+
+# Archivos de la IA locales (ESTADO.md sí sube a git)
+INICIO.md
+AGENTS.md
+CLAUDE.md
+KIMI.md
+CODEX.md
+GEMINI.md
+RESUMEN.md
+instalar.py
+"""
+    validar_y_reemplazar = False
+    
+    if not gitignore_dst.exists():
+        gitignore_dst.write_text(gitignore_rules, encoding="utf-8")
+        print("Reglas del sistema IA agregadas al .gitignore original.")
+    else:
+        current_gitignore = gitignore_dst.read_text(encoding="utf-8")
+        if "sistema-ia" not in current_gitignore or "ESTADO.md" in current_gitignore:
+            # Si tiene las reglas viejas (que ignoran ESTADO.md) limpiamos o las anexamos. 
+            # De forma sencilla las adjuntamos al final, pero si el usuario usaba la version anterior
+            # ESTADO.md estaba ignorado (INICIO.md, AGENTS.md, ESTADO.md). 
+            # Para no destruir su archivo vamos a simplemente re-agregar las reglas o quitar "ESTADO.md"
+            nuevo_gitignore = current_gitignore.replace("ESTADO.md\n", "")
+            if "\n!sistema-ia/discusiones/" not in nuevo_gitignore:
+                nuevo_gitignore += "\n" + gitignore_rules
+
+            with open(gitignore_dst, "w", encoding="utf-8") as f:
+                f.write(nuevo_gitignore)
+            print("Reglas del sistema IA actualizadas en el .gitignore del proyecto.")
+        else:
+            pass
+
+
 def main():
     v_actual = version_actual()
     v_nueva  = version_nueva()
@@ -195,6 +237,9 @@ def main():
     for carpeta in ["planes", "discusiones", "memoria/sesiones", "handoff", "logs"]:
         p = SIA / carpeta
         p.mkdir(parents=True, exist_ok=True)
+
+    # 5. Actualizar .gitignore
+    configurar_gitignore()
 
     # 5. VERSION
     if v_actual != v_nueva:

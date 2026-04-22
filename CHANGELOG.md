@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.5 — 2026-04-21
+### Mejorado: gitignore inteligente para trabajo en equipo
+- Se actualizó `instalar.py` y `migrar.py` para que autoconfiguren el `.gitignore` del proyecto que recibe el sistema IA. 
+- Ahora, `ESTADO.md`, `sistema-ia/discusiones/`, y `sistema-ia/planes/` **sí** se rastrean por defecto en Git para que el equipo pueda mantenerse sincronizado. 
+- El resto del sistema (memoria, logs, scripts, agentes) permanecerá oculto y local para evitar ruido en el repositorio.
+
 ## v2.4 — 2026-04-18
 ### Reestructura (Fix B) — git pull ahora actualiza scripts directamente
 - Scripts movidos a `acciones/` en la raíz del repo. Al clonar como `sistema-ia/`, quedan en `sistema-ia/acciones/` — directamente en git. `git pull` en `sistema-ia/` los actualiza sin pasos extra.

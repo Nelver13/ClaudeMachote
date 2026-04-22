@@ -120,6 +120,37 @@ def instalar(destino: Path):
         shutil.rmtree(machote_dst)
         print("  OK: sistema-ia/machote/ eliminado (ya no se necesita)")
 
+    # 7. Configurar .gitignore del proyecto
+    gitignore_dst = destino / ".gitignore"
+    gitignore_rules = """
+# ── Sistema IA (Generado) ───────────────────────────────
+# Ocultar scripts y memoria, pero mantener discusiones y planes para el equipo
+sistema-ia/*
+!sistema-ia/discusiones/
+!sistema-ia/planes/
+
+# Archivos de la IA locales (ESTADO.md sí sube a git)
+INICIO.md
+AGENTS.md
+CLAUDE.md
+KIMI.md
+CODEX.md
+GEMINI.md
+RESUMEN.md
+instalar.py
+"""
+    if not gitignore_dst.exists():
+        gitignore_dst.write_text(gitignore_rules, encoding="utf-8")
+        print("  OK: Creado .gitignore con reglas del sistema IA")
+    else:
+        current_gitignore = gitignore_dst.read_text(encoding="utf-8")
+        if "sistema-ia" not in current_gitignore:
+            with open(gitignore_dst, "a", encoding="utf-8") as f:
+                f.write("\n" + gitignore_rules)
+            print("  OK: Actualizado .gitignore con reglas del sistema IA")
+        else:
+            print("  SKIP: .gitignore ya contiene reglas de sistema-ia")
+
     print()
     print("Listo. Proximos pasos:")
     print("  1. Edita ESTADO.md → nombre del proyecto y roles")
