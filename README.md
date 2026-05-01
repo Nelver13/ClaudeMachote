@@ -91,6 +91,14 @@ Verifica que existen: INICIO.md, AGENTS.md, ESTADO.md
 Si faltan → copiar de sistema-ia-temp/machote/ (antes de borrarlo)
 NO sobrescribir los que ya existen con datos del proyecto.
 
+== PASO 6b — Crear estructura de bugs si no existe ==
+Si NO existe la carpeta `sistema-ia/discusiones/bugs/`, créala AHORA:
+- sistema-ia/discusiones/bugs/
+- sistema-ia/discusiones/bugs/screenshots/
+- Crea sistema-ia/discusiones/bugs/backlog.md con este contenido exacto:
+  # Bugs Reportados
+  > Usa Alt+R para reportar bugs con screenshot y descripción.
+
 == PASO 7 — Instalar dependencias ==
 Abre una terminal y ejecuta EXACTAMENTE este comando:
 `pip install Pillow pynput SpeechRecognition pyaudio`
