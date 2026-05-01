@@ -14,7 +14,7 @@ Copia este prompt y pégalo a la IA en un proyecto vacío:
 Instala el sistema multi-IA en este proyecto.
 
 PASO 1 — Clona el sistema:
-git clone git@github.com:Nelver13/ClaudeMachote.git sistema-ia
+git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia
 
 PASO 2 — Ejecuta el instalador:
 python sistema-ia/machote/instalar.py
@@ -62,7 +62,7 @@ Actualiza el sistema IA de este proyecto.
 Si tienes duda → para y avisa. No adivines.
 
 == PASO 1 — Re-clonar en temporal ==
-git clone git@github.com:Nelver13/ClaudeMachote.git sistema-ia-temp
+git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia-temp
 
 == PASO 2 — Copiar solo scripts y skills ==
 Copia SOLO estos directorios del clon nuevo al existente:
@@ -87,10 +87,23 @@ Verifica que existen: INICIO.md, AGENTS.md, ESTADO.md
 Si faltan → copiar de sistema-ia-temp/machote/ (antes de borrarlo)
 NO sobrescribir los que ya existen con datos del proyecto.
 
-== PASO 7 — Avisar ==
+== PASO 7 — Instalar dependencias ==
+Abre una terminal y ejecuta EXACTAMENTE este comando:
+`pip install Pillow pynput SpeechRecognition pyaudio`
+(Usa --user si te da error de permisos).
+
+== PASO 8 — Actualizar run.bat y run.sh ==
+Lee el ESTADO.md para ver el stack. Abre run.bat y run.sh (si existen) y actualízalos para levantar TODO el stack del proyecto (ej. React + Django).
+IMPORTANTE: Siempre debes agregar o mantener la línea que levanta el reporter en background (`start /B python sistema-ia\acciones\reportar.py`). No lo borres.
+
+== PASO 9 — Avisar ==
 python sistema-ia/acciones/avisar.py "Sistema actualizado a vX.Y" normal
 
-== PASO 8 — Reportar ==
+== PASO 10 — Mostrar Guía ==
+Ejecuta la interfaz de novedades para el usuario:
+python sistema-ia/acciones/guia.py
+
+== PASO 11 — Reportar ==
 - Versión instalada
 - Qué se actualizó
 - Plan activo: intacto o no

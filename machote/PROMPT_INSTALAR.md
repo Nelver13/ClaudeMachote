@@ -7,7 +7,7 @@
 Instala el sistema multi-IA en este proyecto.
 
 PASO 1 — Clona el sistema:
-git clone git@github.com:Nelver13/ClaudeMachote.git sistema-ia
+git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia
 
 PASO 2 — Ejecuta el instalador:
 python sistema-ia/machote/instalar.py

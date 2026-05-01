@@ -15,7 +15,7 @@ Actualiza el sistema IA de este proyecto.
 Si tienes duda → para y avisa. No adivines.
 
 == PASO 1 — Re-clonar en temporal ==
-git clone git@github.com:Nelver13/ClaudeMachote.git sistema-ia-temp
+git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia-temp
 
 == PASO 2 — Copiar solo scripts y skills ==
 Copia SOLO estos directorios del clon nuevo al existente:

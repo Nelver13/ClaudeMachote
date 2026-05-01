@@ -26,6 +26,30 @@ python sistema-ia/acciones/avisar.py "Proyecto actualizado a v[X.Y]" normal
 
 ---
 
+## v2.7
+
+### Qué cambió
+- **Scripts dinámicos (`run.bat` / `run.sh`):** Ahora los scripts de ejecución no son estáticos. Si el stack del proyecto evoluciona (ej. se agrega un backend Django a un frontend React), el Arquitecto tiene la responsabilidad explícita de actualizar estos scripts para levantar todos los servicios necesarios simultáneamente.
+- **Bug Reporter inamovible:** Al actualizar `run.bat` o `run.sh`, el Arquitecto siempre debe preservar la línea que lanza el Bug Reporter en background.
+
+### Instrucciones para la IA (si actualizas un proyecto a v2.7):
+
+**1. Verificar AGENTS.md**
+Lee la sección del Arquitecto en `AGENTS.md` y asegúrate de que incluya la responsabilidad de actualizar dinámicamente `run.bat` y `run.sh`.
+
+**2. Actualizar run.bat y run.sh actuales**
+Revisa el `ESTADO.md` para ver el stack actual. Verifica el contenido de `run.bat` y `run.sh` en la raíz. Si no están levantando todo el stack del proyecto o si no están levantando el reporter de bugs (`python sistema-ia/acciones/reportar.py`), **ACTUALÍZALOS AHORA**.
+Ejemplo de inyección de Bug Reporter:
+Windows: `start /B python sistema-ia\acciones\reportar.py`
+Unix: `python sistema-ia/acciones/reportar.py &`
+
+**3. Avisar**
+```bash
+python sistema-ia/acciones/avisar.py "Proyecto actualizado a v2.7" normal
+```
+
+---
+
 ## v2.6
 
 ### Qué cambió
