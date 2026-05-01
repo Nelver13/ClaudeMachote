@@ -33,6 +33,10 @@ BUGS_DIR = ROOT / "sistema-ia" / "discusiones" / "bugs"
 SCREENSHOTS_DIR = BUGS_DIR / "screenshots"
 BACKLOG_FILE = BUGS_DIR / "backlog.md"
 
+# Asegurar que las carpetas existan desde que arranca el script
+BUGS_DIR.mkdir(parents=True, exist_ok=True)
+SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def contar_bugs():
     """Cuenta bugs existentes para generar el siguiente número."""

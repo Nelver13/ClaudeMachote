@@ -164,6 +164,7 @@ Al terminar: `python sistema-ia/acciones/finalizar_discusion.py [modulo] [versio
 - ✅ Definir APIs y estructura de archivos
 - ✅ Crear planes detallados y autocontenidos
 - ✅ Documentar decisiones en sistema-ia/discusiones/
+- ✅ **Gestionar run.bat / run.sh:** Actualizar estos archivos si el stack crece (ej. si se añade Django a un proyecto React, asegurar que ambos servidores levanten). *Asegurarse siempre de mantener la línea que levanta el reporter de bugs en background*.
 - ❌ NO implementar código de producción
 - ❌ NO resumir en chat lo que escribió en la discusión
 
@@ -240,8 +241,10 @@ Bugs se acumulan en backlog.md
 ## SCRIPTS DE EJECUCIÓN
 
 El proyecto tiene `run.bat` (Windows) y `run.sh` (Mac/Linux) en la raíz.
-El arquitecto los configura según el stack durante la discusión 0-vision.
-El dev solo ejecuta `run.bat` o `./run.sh` para lanzar la app.
+- El Arquitecto los configura según el stack durante la discusión 0-vision.
+- **Si el stack evoluciona** (ej. se agrega un backend Django a un frontend React), el Arquitecto debe **actualizar** los scripts `run.bat` y `run.sh` para que levanten ambos servidores en paralelo.
+- **IMPORTANTE:** Ambos scripts SIEMPRE deben incluir el inicio en segundo plano del Bug Reporter (`start /B python sistema-ia\acciones\reportar.py` en Windows y `python sistema-ia/acciones/reportar.py &` en Unix). NUNCA borres esta línea.
+- El Dev solo ejecuta `run.bat` o `./run.sh` para lanzar la app completa.
 
 ---
 

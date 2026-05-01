@@ -40,18 +40,23 @@ Verifica que existen: INICIO.md, AGENTS.md, ESTADO.md
 Si faltan → copiar de sistema-ia-temp/machote/ (antes de borrarlo)
 NO sobrescribir los que ya existen con datos del proyecto.
 
-== PASO 7 — Actualizar run.bat y run.sh ==
+== PASO 7 — Instalar dependencias ==
+Abre una terminal y ejecuta EXACTAMENTE este comando:
+`pip install Pillow pynput SpeechRecognition pyaudio`
+(Usa --user si te da error de permisos).
+
+== PASO 8 — Actualizar run.bat y run.sh ==
 Lee el ESTADO.md para ver el stack. Abre run.bat y run.sh (si existen) y actualízalos para levantar TODO el stack del proyecto (ej. React + Django).
 IMPORTANTE: Siempre debes agregar o mantener la línea que levanta el reporter en background (`start /B python sistema-ia\acciones\reportar.py`). No lo borres.
 
-== PASO 8 — Avisar ==
+== PASO 9 — Avisar ==
 python sistema-ia/acciones/avisar.py "Sistema actualizado a vX.Y" normal
 
-== PASO 9 — Mostrar Guía ==
+== PASO 10 — Mostrar Guía ==
 Ejecuta la interfaz de novedades para el usuario:
 python sistema-ia/acciones/guia.py
 
-== PASO 10 — Reportar ==
+== PASO 11 — Reportar ==
 - Versión instalada
 - Qué se actualizó
 - Plan activo: intacto o no
