@@ -217,6 +217,9 @@ REM === Script de ejecución del proyecto ===
 REM El arquitecto actualiza esto según el stack definido en 0-vision.
 REM El dev solo ejecuta: run.bat
 
+REM Iniciar el Bug Reporter en background
+start /B python sistema-ia\\acciones\\reportar.py
+
 echo [!] Configura este archivo con el comando de tu proyecto.
 echo Ejemplo: npm run dev / python manage.py runserver / cargo tauri dev
 pause
@@ -229,6 +232,9 @@ pause
 # El arquitecto actualiza esto según el stack definido en 0-vision.
 # El dev solo ejecuta: ./run.sh
 
+# Iniciar el Bug Reporter en background
+python sistema-ia/acciones/reportar.py &
+
 echo "[!] Configura este archivo con el comando de tu proyecto."
 echo "Ejemplo: npm run dev / python manage.py runserver / cargo tauri dev"
 """, encoding="utf-8")
@@ -240,27 +246,73 @@ echo "Ejemplo: npm run dev / python manage.py runserver / cargo tauri dev"
     import subprocess
     try:
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "Pillow", "pynput", "--quiet"],
-            check=True, timeout=60
+            [sys.executable, "-m", "pip", "install", "Pillow", "pynput", "SpeechRecognition", "pyaudio", "--quiet"],
+            check=True, timeout=120
         )
-        print("  OK: Pillow + pynput instalados")
+        print("  OK: Pillow + pynput + SpeechRecognition instalados")
+def mostrar_guia_tkinter():
+    try:
+        import tkinter as tk
+        from tkinter import font
+        
+        root = tk.Tk()
+        root.title("🚀 ClaudeMachote Instalado con Éxito")
+        root.geometry("600x550")
+        root.configure(bg="#1a1a2e")
+        root.attributes("-topmost", True)
+        
+        # Estilos
+        bg_color = "#1a1a2e"
+        fg_color = "#e0e0e0"
+        accent_color = "#e94560"
+        title_font = font.Font(family="Segoe UI", size=16, weight="bold")
+        h2_font = font.Font(family="Segoe UI", size=12, weight="bold")
+        text_font = font.Font(family="Segoe UI", size=10)
+        
+        # Contenedor principal con padding
+        main_frame = tk.Frame(root, bg=bg_color, padx=30, pady=20)
+        main_frame.pack(fill="both", expand=True)
+        
+        # Título
+        tk.Label(main_frame, text="✅ Instalación Completa", font=title_font, fg=accent_color, bg=bg_color).pack(anchor="w", pady=(0, 15))
+        
+        # Sección 1
+        tk.Label(main_frame, text="¿QUÉ ES ESTE SISTEMA?", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(10, 5))
+        desc = "Has configurado una arquitectura multi-IA (Arquitecto/Dev).\nEl sistema organiza el trabajo en: discusiones -> planes -> código.\nMantiene el estado guardado para que la IA nunca pierda contexto."
+        tk.Label(main_frame, text=desc, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
+        
+        # Sección 2
+        tk.Label(main_frame, text="🐛 NUEVO: BUG REPORTER (v2.6)", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(15, 5))
+        bugs = "1. Presiona Alt+R en cualquier momento.\n2. Dibuja rectángulos rojos señalando el error en pantalla.\n3. Escribe qué falla (se guarda en: discusiones/bugs/backlog.md).\n4. La IA (Arquitecto) leerá los bugs para planear cómo arreglarlos."
+        tk.Label(main_frame, text=bugs, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
+        
+        # Sección 3
+        tk.Label(main_frame, text="🔄 SCRIPTS DE EJECUCIÓN", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(15, 5))
+        scripts = "Usa siempre run.bat o ./run.sh para iniciar tu proyecto.\nEstos scripts arrancan tu app Y lanzan el Bug Reporter en background."
+        tk.Label(main_frame, text=scripts, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
+        
+        # Sección 4
+        tk.Label(main_frame, text="📝 PRÓXIMOS PASOS (Obligatorio):", font=h2_font, fg=accent_color, bg=bg_color).pack(anchor="w", pady=(15, 5))
+        pasos = "1. Abre ESTADO.md → reemplaza NOMBRE_PROYECTO y ajusta roles.\n2. Abre CLAUDE.md/KIMI.md/etc → reemplaza NOMBRE_PROYECTO.\n3. Abre tu editor (ej. Cursor/VSCode) e invoca a tu IA.\n4. Pega el PROMPT DE INSTALACIÓN (está en el README de GitHub).\n5. Sigue las instrucciones de la IA para iniciar la visión (0-vision)."
+        tk.Label(main_frame, text=pasos, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
+        
+        # Botón cerrar
+        btn_frame = tk.Frame(main_frame, bg=bg_color)
+        btn_frame.pack(fill="x", pady=(25, 0))
+        tk.Button(btn_frame, text="Entendido, ¡A codear!", command=root.destroy, 
+                  font=h2_font, bg=accent_color, fg="white", relief="flat", padx=20, pady=8).pack()
+        
+        # Centrar ventana
+        root.update_idletasks()
+        width = root.winfo_width()
+        height = root.winfo_height()
+        x = (root.winfo_screenwidth() // 2) - (width // 2)
+        y = (root.winfo_screenheight() // 2) - (height // 2)
+        root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+        
+        root.mainloop()
     except Exception as e:
-        print(f"  WARN: No se pudieron instalar dependencias: {e}")
-        print("  Ejecuta manualmente: pip install Pillow pynput")
-
-    print()
-    print("═" * 50)
-    print("  INSTALACIÓN COMPLETA")
-    print("═" * 50)
-    print()
-    print("Próximos pasos:")
-    print("  1. Edita ESTADO.md → nombre del proyecto y roles")
-    print("  2. Edita CLAUDE.md / KIMI.md etc. → nombre del proyecto")
-    print("  3. Abre tu IA → arranca la discusión de visión (0-vision)")
-    print()
-    print("El bug reporter se activa automáticamente con el sistema IA.")
-    print("Hotkey: Ctrl+Shift+B para reportar bugs.")
-
+        print("\n¡Instalación completa! (Error lanzando interfaz gráfica)")
 
 def main():
     destino = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
@@ -268,6 +320,7 @@ def main():
         print(f"ERROR: No existe {destino}")
         sys.exit(1)
     instalar(destino)
+    mostrar_guia_tkinter()
 
 
 if __name__ == "__main__":

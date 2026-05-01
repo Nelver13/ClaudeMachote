@@ -26,6 +26,37 @@ python sistema-ia/acciones/avisar.py "Proyecto actualizado a v[X.Y]" normal
 
 ---
 
+## v2.6
+
+### Qué cambió
+- Instalación limpia: `instalar.py` borra automáticamente `.git/` de `sistema-ia/` (adiós repos anidados).
+- Discusiones fijas: el Arquitecto ahora consolida y reescribe `r/` en discusiones de tamaño fijo (max ~80 líneas). CERO resúmenes en chat.
+- Bug Reporter: script `reportar.py` activable con `Alt+R`. Se inicia solo en background en los scripts `run.bat` / `run.sh` que se generan.
+- Dictado por voz (Push-to-Talk): El Bug Reporter ahora permite dictar bugs con voz usando la librería `SpeechRecognition`.
+- Guía interactiva: Al finalizar `instalar.py`, se despliega una interfaz gráfica de bienvenida.
+- Review Caveman: al completar un plan, se genera `memoria/[modulo]/review.md` ultracompacto y se limpian screenshots de bugs.
+
+### Instrucciones para la IA (si actualizas un proyecto):
+
+**1. Verificar AGENTS.md**
+Lee la sección del Arquitecto en `AGENTS.md` y `SKILL.md` (modo-arquitecto). El comportamiento del Arquitecto ahora es de **Cero Resúmenes** y reemplazo total de la sección "Tema actual" en las discusiones al procesar feedbacks `r/`.
+Asegúrate de que la IA conozca la regla de no aumentar indefinidamente el archivo de discusión.
+
+**2. Verificar dependencias del Bug Reporter**
+Abre una terminal y ejecuta: `pip install Pillow pynput SpeechRecognition pyaudio --quiet` (si falla o tarda, usa el flag `--user`).
+
+**3. Verificar scripts de ejecución en la raíz**
+Si el proyecto no tiene `run.bat` o `run.sh` en su raíz, créalos. Asegúrate de incluir la línea para lanzar el reporter:
+- Windows (`run.bat`): `start /B python sistema-ia\acciones\reportar.py`
+- Linux/Mac (`run.sh`): `python sistema-ia/acciones/reportar.py &`
+
+**4. Avisar**
+```bash
+python sistema-ia/acciones/avisar.py "Proyecto actualizado a v2.6" normal
+```
+
+---
+
 ## v2.5
 
 ### Que cambio

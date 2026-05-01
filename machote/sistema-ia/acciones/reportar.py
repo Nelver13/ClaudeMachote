@@ -5,7 +5,7 @@ Captura screenshots, permite anotar, y guarda en bugs/backlog.md.
 Funciona con cualquier aplicación (OS-level).
 
 Se activa automáticamente al iniciar sesión IA (auto_setup.py).
-Hotkey: Ctrl+Shift+B
+Hotkey: Alt+R
 
 Dependencias: pip install Pillow pynput
 """
@@ -73,43 +73,234 @@ def obtener_ventana_activa():
 
 
 def mostrar_dialogo(screenshot_path, bug_num):
-    """Muestra un diálogo tkinter para que el usuario describa el bug."""
+    """Muestra diálogo con preview del screenshot donde el usuario puede dibujar rectángulos rojos para marcar el bug."""
     try:
         import tkinter as tk
         from tkinter import scrolledtext
+        from PIL import Image, ImageTk, ImageDraw
 
         ventana_activa = obtener_ventana_activa()
 
+        # Cargar screenshot para preview
+        img_original = None
+        img_display = None
+        scale_factor = 1.0
+        if screenshot_path and screenshot_path.exists():
+            img_original = Image.open(str(screenshot_path))
+            # Escalar para que quepa en pantalla (max 900x500)
+            max_w, max_h = 900, 500
+            w, h = img_original.size
+            scale_factor = min(max_w / w, max_h / h, 1.0)
+            new_w, new_h = int(w * scale_factor), int(h * scale_factor)
+            img_display = img_original.resize((new_w, new_h), Image.LANCZOS)
+
         root = tk.Tk()
-        root.title(f"🐛 Reportar Bug #{bug_num}")
-        root.geometry("500x350")
+        root.title(f"🐛 Bug #{bug_num} — Marca el problema y describe")
         root.attributes("-topmost", True)
         root.configure(bg="#1a1a2e")
 
-        # Estilo
         fg = "#e0e0e0"
-        bg = "#1a1a2e"
+        bg_color = "#1a1a2e"
         entry_bg = "#16213e"
 
-        tk.Label(root, text=f"Bug #{bug_num}", font=("Segoe UI", 16, "bold"),
-                 fg="#e94560", bg=bg).pack(pady=(15, 5))
+        # Header
+        header = tk.Frame(root, bg=bg_color)
+        header.pack(fill="x", padx=10, pady=(8, 4))
+        tk.Label(header, text=f"🐛 Bug #{bug_num}", font=("Segoe UI", 14, "bold"),
+                 fg="#e94560", bg=bg_color).pack(side="left")
+        tk.Label(header, text=f"  |  {ventana_activa[:50]}",
+                 font=("Segoe UI", 9), fg="#7f8c8d", bg=bg_color).pack(side="left")
+        tk.Label(header, text="Dibuja rectángulos rojos sobre el screenshot para señalar el bug",
+                 font=("Segoe UI", 9, "italic"), fg="#27ae60", bg=bg_color).pack(side="right")
 
-        tk.Label(root, text=f"Ventana: {ventana_activa[:60]}",
-                 font=("Segoe UI", 9), fg="#7f8c8d", bg=bg).pack()
+        # Canvas con screenshot
+        canvas = None
+        tk_img = None
+        rects = []  # lista de rectángulos dibujados
+        draw_data = {"start_x": 0, "start_y": 0, "current_rect": None}
 
-        if screenshot_path:
-            tk.Label(root, text=f"📸 Screenshot guardado",
-                     font=("Segoe UI", 9), fg="#27ae60", bg=bg).pack(pady=(5, 0))
+        if img_display:
+            canvas_frame = tk.Frame(root, bg="#000", bd=2, relief="sunken")
+            canvas_frame.pack(fill="both", expand=True, padx=10, pady=4)
 
-        tk.Label(root, text="Descripción del bug:",
-                 font=("Segoe UI", 10), fg=fg, bg=bg, anchor="w").pack(
-                     fill="x", padx=20, pady=(15, 5))
+            tk_img = ImageTk.PhotoImage(img_display)
+            canvas = tk.Canvas(canvas_frame, width=img_display.width, height=img_display.height,
+                              bg="#000", highlightthickness=0, cursor="crosshair")
+            canvas.pack()
+            canvas.create_image(0, 0, anchor="nw", image=tk_img)
 
-        texto = scrolledtext.ScrolledText(root, height=6, font=("Segoe UI", 10),
+            def on_press(event):
+                draw_data["start_x"] = event.x
+                draw_data["start_y"] = event.y
+                draw_data["current_rect"] = canvas.create_rectangle(
+                    event.x, event.y, event.x, event.y,
+                    outline="#ff0000", width=3
+                )
+
+            def on_drag(event):
+                if draw_data["current_rect"]:
+                    canvas.coords(draw_data["current_rect"],
+                                  draw_data["start_x"], draw_data["start_y"],
+                                  event.x, event.y)
+
+            def on_release(event):
+                if draw_data["current_rect"]:
+                    x1 = int(draw_data["start_x"] / scale_factor)
+                    y1 = int(draw_data["start_y"] / scale_factor)
+                    x2 = int(event.x / scale_factor)
+                    y2 = int(event.y / scale_factor)
+                    
+                    num = len(rects) + 1
+
+                    def pedir_descripcion_marca(num):
+                        dlg = tk.Toplevel(root)
+                        dlg.title(f"Marca #{num}")
+                        dlg.geometry("450x180")
+                        dlg.attributes("-topmost", True)
+                        dlg.configure(bg="#1a1a2e")
+                        dlg.transient(root)
+                        dlg.grab_set()
+
+                        resultado = {"desc": None}
+
+                        tk.Label(dlg, text=f"¿Qué señala esta marca #{num}?", font=("Segoe UI", 11), bg="#1a1a2e", fg="#e0e0e0").pack(pady=(15, 5))
+                        
+                        entry = tk.Entry(dlg, font=("Segoe UI", 11), bg="#16213e", fg="#e0e0e0", insertbackground="#e0e0e0")
+                        entry.pack(pady=5, padx=20, fill="x")
+                        entry.focus_set()
+
+                        def btn_ok(event=None):
+                            resultado["desc"] = entry.get().strip()
+                            dlg.destroy()
+
+                        def btn_dictar_marca():
+                            if not hasattr(btn_dic, "is_recording"):
+                                btn_dic.is_recording = False
+                            
+                            if not btn_dic.is_recording:
+                                btn_dic.is_recording = True
+                                btn_dic.audio_frames = []
+                                btn_dic.config(text="🛑 Parar", bg="#ff0000")
+                                
+                                def record_thread():
+                                    try:
+                                        import pyaudio
+                                        import speech_recognition as sr
+                                        p = pyaudio.PyAudio()
+                                        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
+                                        while getattr(btn_dic, "is_recording", False):
+                                            data = stream.read(1024, exception_on_overflow=False)
+                                            btn_dic.audio_frames.append(data)
+                                        stream.stop_stream()
+                                        stream.close()
+                                        p.terminate()
+                                        
+                                        btn_dic.config(text="⏳ Proc...", bg="#f39c12")
+                                        dlg.update()
+                                        
+                                        audio_data = b''.join(btn_dic.audio_frames)
+                                        if len(audio_data) > 0:
+                                            audio = sr.AudioData(audio_data, 16000, 2)
+                                            r = sr.Recognizer()
+                                            txt = r.recognize_google(audio, language='es-ES')
+                                            
+                                            current = entry.get()
+                                            entry.delete(0, tk.END)
+                                            entry.insert(0, (current + " " + txt).strip())
+                                    except Exception as e:
+                                        print(f"Error dictando: {e}")
+                                    finally:
+                                        try:
+                                            btn_dic.config(text="🎤 Dictar", bg="#2980b9")
+                                        except tk.TclError:
+                                            pass # La ventana podría haberse cerrado
+                                
+                                import threading
+                                threading.Thread(target=record_thread, daemon=True).start()
+                            else:
+                                btn_dic.is_recording = False
+
+                        frame_btns = tk.Frame(dlg, bg="#1a1a2e")
+                        frame_btns.pack(pady=(10, 15), fill="x", padx=20)
+
+                        tk.Button(frame_btns, text="Cancelar", command=dlg.destroy, bg="#2c3e50", fg="white", relief="flat", padx=10, pady=3).pack(side="right", padx=(5, 0))
+                        tk.Button(frame_btns, text="Aceptar", command=btn_ok, bg="#e94560", fg="white", relief="flat", padx=10, font=("Segoe UI", 10, "bold"), pady=3).pack(side="right")
+                        btn_dic = tk.Button(frame_btns, text="🎤 Dictar", command=btn_dictar_marca, bg="#2980b9", fg="white", relief="flat", padx=10, font=("Segoe UI", 10, "bold"), pady=3)
+                        btn_dic.pack(side="left")
+
+                        dlg.bind("<Return>", btn_ok)
+                        
+                        # Centrar la ventanita respecto a la ventana principal
+                        dlg.update_idletasks()
+                        x = root.winfo_x() + (root.winfo_width() // 2) - (dlg.winfo_width() // 2)
+                        y = root.winfo_y() + (root.winfo_height() // 2) - (dlg.winfo_height() // 2)
+                        dlg.geometry(f"+{x}+{y}")
+                        
+                        root.wait_window(dlg)
+                        return resultado["desc"]
+
+                    # Pedir descripción para la marca
+                    desc_marca = pedir_descripcion_marca(num)
+                    
+                    if desc_marca:
+                        rects.append((x1, y1, x2, y2, num))
+                        
+                        # Dibujar el número en el canvas
+                        cx = min(draw_data["start_x"], event.x)
+                        cy = max(draw_data["start_y"], event.y)
+                        
+                        # Sombra para el texto para que resalte
+                        canvas.create_text(cx + 6, cy + 6, text=str(num), fill="black", font=("Arial", 16, "bold"), anchor="nw", tags="marks")
+                        canvas.create_text(cx + 5, cy + 5, text=str(num), fill="#00ff00", font=("Arial", 16, "bold"), anchor="nw", tags="marks")
+                        
+                        # Añadir la descripción al text area automáticamente
+                        current_text = texto.get("1.0", "end").strip()
+                        nueva_linea = f"Marca #{num}: {desc_marca}"
+                        if current_text:
+                            texto.insert("end", f"\n{nueva_linea}")
+                        else:
+                            texto.insert("end", nueva_linea)
+                    else:
+                        # Si cancela, borrar el rectángulo del canvas
+                        canvas.delete(draw_data["current_rect"])
+
+                    draw_data["current_rect"] = None
+
+            def undo(event=None):
+                if rects:
+                    rects.pop()
+                    # Redibujar canvas
+                    canvas.delete("all")
+                    canvas.create_image(0, 0, anchor="nw", image=tk_img)
+                    for (x1, y1, x2, y2, num) in rects:
+                        canvas.create_rectangle(
+                            int(x1 * scale_factor), int(y1 * scale_factor),
+                            int(x2 * scale_factor), int(y2 * scale_factor),
+                            outline="#ff0000", width=3
+                        )
+                        cx = min(int(x1 * scale_factor), int(x2 * scale_factor))
+                        cy = max(int(y1 * scale_factor), int(y2 * scale_factor))
+                        canvas.create_text(cx + 6, cy + 6, text=str(num), fill="black", font=("Arial", 16, "bold"), anchor="nw", tags="marks")
+                        canvas.create_text(cx + 5, cy + 5, text=str(num), fill="#00ff00", font=("Arial", 16, "bold"), anchor="nw", tags="marks")
+
+            canvas.bind("<ButtonPress-1>", on_press)
+            canvas.bind("<B1-Motion>", on_drag)
+            canvas.bind("<ButtonRelease-1>", on_release)
+            root.bind("<Control-z>", undo)
+
+        # Descripción
+        desc_frame = tk.Frame(root, bg=bg_color)
+        desc_frame.pack(fill="x", padx=10, pady=(4, 2))
+        tk.Label(desc_frame, text="Descripción general:", font=("Segoe UI", 10),
+                 fg=fg, bg=bg_color).pack(side="left")
+        tk.Label(desc_frame, text="(Ctrl+Z = deshacer marca, Ctrl+Enter = enviar)",
+                 font=("Segoe UI", 8), fg="#7f8c8d", bg=bg_color).pack(side="right")
+
+        texto = scrolledtext.ScrolledText(root, height=5, font=("Segoe UI", 10),
                                            bg=entry_bg, fg=fg,
                                            insertbackground=fg,
                                            relief="flat", borderwidth=2)
-        texto.pack(fill="both", expand=True, padx=20)
+        texto.pack(fill="x", padx=10, pady=(0, 4))
         texto.focus_set()
 
         resultado = {"descripcion": None}
@@ -118,21 +309,94 @@ def mostrar_dialogo(screenshot_path, bug_num):
             desc = texto.get("1.0", "end").strip()
             if desc:
                 resultado["descripcion"] = desc
+                # Dibujar rectángulos en la imagen original y guardar
+                if img_original and rects:
+                    draw = ImageDraw.Draw(img_original)
+                    from PIL import ImageFont
+                    try:
+                        font = ImageFont.truetype("arialbd.ttf", 32)
+                    except IOError:
+                        font = ImageFont.load_default()
+                        
+                    for (x1, y1, x2, y2, num) in rects:
+                        draw.rectangle([x1, y1, x2, y2], outline="red", width=4)
+                        cx = min(x1, x2)
+                        cy = max(y1, y2)
+                        # Shadow
+                        draw.text((cx + 8, cy + 8), str(num), fill="black", font=font)
+                        # Text
+                        draw.text((cx + 5, cy + 5), str(num), fill="#00ff00", font=font)
+                    img_original.save(str(screenshot_path))
             root.destroy()
 
         def cancelar():
             root.destroy()
 
-        frame_btns = tk.Frame(root, bg=bg)
-        frame_btns.pack(fill="x", padx=20, pady=15)
+        def dictar_audio():
+            if not hasattr(btn_dictar, "is_recording"):
+                btn_dictar.is_recording = False
+            
+            if not btn_dictar.is_recording:
+                btn_dictar.is_recording = True
+                btn_dictar.audio_frames = []
+                btn_dictar.config(text="🛑 Parar", bg="#ff0000")
+                
+                def record_thread():
+                    try:
+                        import pyaudio
+                        import speech_recognition as sr
+                        p = pyaudio.PyAudio()
+                        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
+                        while getattr(btn_dictar, "is_recording", False):
+                            data = stream.read(1024, exception_on_overflow=False)
+                            btn_dictar.audio_frames.append(data)
+                        stream.stop_stream()
+                        stream.close()
+                        p.terminate()
+                        
+                        btn_dictar.config(text="⏳ Procesando...", bg="#f39c12")
+                        root.update()
+                        
+                        audio_data = b''.join(btn_dictar.audio_frames)
+                        if len(audio_data) > 0:
+                            audio = sr.AudioData(audio_data, 16000, 2)
+                            r = sr.Recognizer()
+                            texto_dictado = r.recognize_google(audio, language='es-ES')
+                            
+                            current_text = texto.get("1.0", "end").strip()
+                            if current_text:
+                                texto.insert("end", f" {texto_dictado}")
+                            else:
+                                texto.insert("end", texto_dictado)
+                                
+                    except Exception as e:
+                        print(f"Error dictando: {e}")
+                    finally:
+                        try:
+                            btn_dictar.config(text="🎤 Dictar", bg="#2980b9")
+                        except tk.TclError:
+                            pass
+
+                import threading
+                threading.Thread(target=record_thread, daemon=True).start()
+            else:
+                btn_dictar.is_recording = False
+
+        frame_btns = tk.Frame(root, bg=bg_color)
+        frame_btns.pack(fill="x", padx=10, pady=(0, 8))
 
         tk.Button(frame_btns, text="Cancelar", command=cancelar,
                   font=("Segoe UI", 10), bg="#2c3e50", fg=fg,
-                  relief="flat", padx=15, pady=5).pack(side="right", padx=(5, 0))
+                  relief="flat", padx=12, pady=4).pack(side="right", padx=(5, 0))
 
         tk.Button(frame_btns, text="📤 Enviar", command=enviar,
                   font=("Segoe UI", 10, "bold"), bg="#e94560", fg="white",
-                  relief="flat", padx=15, pady=5).pack(side="right")
+                  relief="flat", padx=12, pady=4).pack(side="right", padx=(5, 0))
+                  
+        btn_dictar = tk.Button(frame_btns, text="🎤 Dictar", command=dictar_audio,
+                  font=("Segoe UI", 10, "bold"), bg="#2980b9", fg="white",
+                  relief="flat", padx=12, pady=4)
+        btn_dictar.pack(side="left")
 
         root.bind("<Control-Return>", enviar)
         root.mainloop()
@@ -204,17 +468,16 @@ def reportar_bug():
 
 
 def iniciar_listener():
-    """Inicia el listener de hotkey Ctrl+Shift+B."""
+    """Inicia el listener de hotkey Alt+R."""
     try:
         from pynput import keyboard
 
-        # Combinación: Ctrl + Shift + B
-        COMBO = {keyboard.Key.ctrl_l, keyboard.Key.shift, keyboard.KeyCode.from_char('b')}
+        # Combinación: Alt + R
         current_keys = set()
 
         def on_press(key):
             current_keys.add(key)
-            if all(k in current_keys for k in COMBO):
+            if keyboard.Key.alt_l in current_keys and keyboard.KeyCode.from_char('r') in current_keys:
                 # Ejecutar en thread separado para no bloquear el listener
                 threading.Thread(target=reportar_bug, daemon=True).start()
 
@@ -223,7 +486,7 @@ def iniciar_listener():
 
         listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         listener.start()
-        print("[reportar] 🐛 Bug reporter activo — Ctrl+Shift+B para reportar")
+        print("[reportar] 🐛 Bug reporter activo — Alt+R para reportar")
         listener.join()
 
     except ImportError:
