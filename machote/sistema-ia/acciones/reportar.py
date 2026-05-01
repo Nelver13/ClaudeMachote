@@ -36,6 +36,13 @@ BACKLOG_FILE = BUGS_DIR / "backlog.md"
 # Asegurar que las carpetas existan desde que arranca el script
 BUGS_DIR.mkdir(parents=True, exist_ok=True)
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+if not BACKLOG_FILE.exists():
+    BACKLOG_FILE.write_text("# Bugs Reportados\n> Usa Alt+R para reportar bugs con screenshot y descripción.\n", encoding="utf-8")
+
+# Diagnóstico visible al arrancar
+print(f"[reportar] Raíz del proyecto : {ROOT}")
+print(f"[reportar] Guardando bugs en  : {BUGS_DIR}")
+print(f"[reportar] Backlog            : {BACKLOG_FILE}")
 
 
 def contar_bugs():
@@ -435,6 +442,7 @@ def guardar_bug(bug_num, descripcion, ventana, screenshot_path):
             f.write(entrada)
 
     print(f"[reportar] Bug #{bug_num} guardado en backlog.md")
+    print(f"[reportar] ↳ {BACKLOG_FILE}")
 
 
 def reportar_bug():
