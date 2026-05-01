@@ -202,7 +202,7 @@ Describe en 1-2 líneas qué hace y para quién.
     if not backlog.exists():
         backlog.write_text("""# Bugs Reportados
 
-> Usa Ctrl+Shift+B para reportar bugs (requiere reportar.py activo).
+> Usa Alt+R para reportar bugs con screenshot y descripción.
 > Los bugs se agregan automáticamente aquí.
 
 """, encoding="utf-8")
@@ -252,7 +252,12 @@ echo "Ejemplo: npm run dev / python manage.py runserver / cargo tauri dev"
             [sys.executable, "-m", "pip", "install", "Pillow", "pynput", "SpeechRecognition", "pyaudio", "--quiet"],
             check=True, timeout=120
         )
-        print("  OK: Pillow + pynput + SpeechRecognition instalados")
+        print("  OK: Pillow + pynput + SpeechRecognition + pyaudio instalados")
+    except Exception as e:
+        print(f"  WARN: No se pudo instalar dependencias automáticamente: {e}")
+        print("  → Ejecuta manualmente: pip install Pillow pynput SpeechRecognition pyaudio")
+
+
 def mostrar_guia_tkinter():
     import subprocess
     try:
