@@ -25,7 +25,7 @@ Modo extremo opcional: skill `caveman` (invocar con `/caveman`). No se activa so
 ## ROLES
 
 | IA | Campo en ESTADO.md | Archivo |
-|----|-------------------|---------|
+|----|-------------------|---------| 
 | Claude | `[ROL_CLAUDE:]` | CLAUDE.md |
 | Kimi | `[ROL_KIMI:]` | KIMI.md |
 | Codex | `[ROL_CODEX:]` | CODEX.md |
@@ -51,22 +51,51 @@ Confirma: "Soy [IA]. Rol: [ROL]. Módulo: [MODULO]. Listo."
 
 ## MODO ARQUITECTO
 
-El debate ocurre EN EL ARCHIVO, no en el chat.
+El debate ocurre EN EL ARCHIVO, no en el chat. **CERO resúmenes en chat.**
+
+### Formato de discusión (estructura fija — nunca crece)
+
+```markdown
+# Discusión: [MODULO]
+**Fecha:** YYYY-MM-DD  **Estado:** En discusión
+
+## Contexto
+[UNA VEZ. No crece.]
+
+## Decisiones cerradas
+- [Punto]: [decisión] — [razón]
+
+## Tema actual
+### [Pregunta que se discute]
+[Opciones, trade-offs]
+```
+
+**Reglas:**
+- "Contexto" se escribe una vez. No se toca.
+- "Decisiones cerradas" solo acumula. Cada una en 1 línea.
+- "Tema actual" se REEMPLAZA con cada nuevo punto.
+- El archivo nunca tiene más de ~80 líneas.
+
+### Flujo
 
 ```
 CHAT                     ARCHIVO discusiones/N-modulo/vN.md
 ────────────             ──────────────────────────────────
-TÚ: "idea X"    →        Arquitecto crea archivo + preguntas. Avisa con script.
-TÚ: escribe feedback en cualquier parte del archivo usando "r/ mis notas"
-TÚ: "1"         →        Arquitecto USA SUS TOOLS para leer todo el archivo, buscar todos los "r/", actualizar el documento y OBLIGATORIAMENTE ejecutar script de aviso.
-(repite hasta listo)
-TÚ: "0"         →        Arquitecto crea plan + PROMPT_DEV usando tools. Avisa.
+TÚ: "idea X"    →        Arquitecto crea archivo + primer tema. Avisa.
+TÚ: escribe feedback usando "r/ mis notas" en cualquier parte del archivo
+TÚ: "1"         →        Arquitecto lee → procesa r/ → consolida:
+                          - r/ cierra punto → "Decisiones cerradas" (1 línea)
+                          - r/ necesita más → reformula "Tema actual"
+                          - Elimina todos los r/ procesados
+                          → Avisa. Chat: "Discusión actualizada" NADA MÁS.
+(repite hasta completar)
+TÚ: "0"         →        Arquitecto crea plan + PROMPT_DEV. Avisa.
 ```
 
-**Comportamiento del debate:**
-- Pregunta cerrada, una por una
-- Si humano no sabe → propone opciones + trade-off → espera decisión
-- Al cerrar todos los temas → escribe plan sin pedir permiso
+**Chat del arquitecto — SOLO estas frases:**
+- `"Discusión actualizada"` — cuando procesó feedback
+- `"Discusión completada — di 0 para generar plan"` — cuando todos los temas están cerrados
+- PROMPT_DEV — al generar plan
 
 **Plan generado incluye siempre:**
 ```
@@ -99,6 +128,21 @@ python sistema-ia/acciones/cambiar_rol.py [ia] dev
 
 ---
 
+## BUGS — Flujo de reportes
+
+Los bugs se reportan con el reporter (Ctrl+Shift+B) o manualmente en `discusiones/bugs/backlog.md`.
+
+```
+Bugs se acumulan en backlog.md
+  → "revisa bugs"
+  → Arquitecto agrupa → crea discusiones/bugs/fix-vN.md
+  → Misma discusión autoconsolidada
+  → Plan → Dev arregla → Bugs marcados [x]
+  → Screenshots de bugs resueltos se borran
+```
+
+---
+
 ## AVISOS — OBLIGATORIO
 
 ```bash
@@ -127,17 +171,24 @@ Al terminar sesión: `python sistema-ia/acciones/cerrar_sesion.py [modulo] [resu
 
 ---
 
+## SCRIPTS DE EJECUCIÓN
+
+El proyecto tiene `run.bat` (Windows) y `run.sh` (Mac/Linux) en la raíz.
+El arquitecto los configura según el stack durante la discusión 0-vision.
+El dev solo ejecuta `run.bat` o `./run.sh` para lanzar la app.
+
+---
+
 ## GIT — REGLAS
 
 **Arquitectura de Repositorio (GITIGNORE):**
-- **SÍ SE SUBE (Público para el equipo):** `ESTADO.md`, `sistema-ia/discusiones/` y `sistema-ia/planes/`. Estas carpetas **deben rastrearse en Git** para auditorías IA, sincronización de equipo, y especulación de tiempos o contratiempos. Constituyen la "verdad absoluta" del avance del sistema.
-- **SE IGNORA (Local del Dev):** Scripts (`sistema-ia/acciones/`), memoria, logs, credenciales y archivos base (`AGENTS.md`, `INICIO.md`). Se mantienen locales para no generar ruido y proteger la configuración privada del desarrollador.
+- **SÍ SE SUBE (Público para el equipo):** `ESTADO.md`, `sistema-ia/discusiones/` y `sistema-ia/planes/`.
+- **SE IGNORA (Local del Dev):** Scripts, memoria, logs, credenciales, archivos IA base.
 
 ```
 ✅ PERMITIDO:
 git status        ← ver estado
 git log           ← ver historial
-git pull          ← actualizar (solo en sistema-ia/)
 git diff          ← ver cambios
 
 ❌ PROHIBIDO SIEMPRE:

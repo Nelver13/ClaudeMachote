@@ -1,6 +1,46 @@
 # Changelog
 
-## v2.5 — 2026-04-21
+## v2.6 — 2026-05-01
+### Instalación limpia
+- `instalar.py` ahora borra `sistema-ia/.git/` automáticamente — elimina repo anidado que contaminaba `git status`
+- Borrar `sistema-ia/.gitignore` del repo clonado (es del machote, no del proyecto)
+- Flujo simplificado: `git clone` + `python instalar.py` = listo
+- `PROMPT_MIGRAR.md` → renombrado a `PROMPT_ACTUALIZAR.md` (re-clonar parcial en vez de git pull)
+
+### Discusiones autoconsolidadas
+- Nuevo formato fijo de discusión: Contexto (1 vez) + Decisiones cerradas (acumula) + Tema actual (se reemplaza)
+- El archivo de discusión nunca crece más de ~80 líneas
+- Al procesar `r/`: si cierra punto → va a Decisiones cerradas. Si necesita más → reformula Tema actual. Elimina el `r/`
+- Chat del arquitecto: CERO resúmenes. Solo "Discusión actualizada" o "Discusión completada"
+
+### Discusión primaria (0-vision)
+- Al instalar se crea `discusiones/0-vision/v1.md` automáticamente
+- Define roadmap del proyecto: qué es, stack, módulos, orden, roles
+- Al completar → genera el plan-roadmap del proyecto
+
+### Bug reporter universal
+- Nuevo script `acciones/reportar.py` — hotkey Ctrl+Shift+B
+- Captura screenshot de ventana activa (Pillow) + overlay de anotación (tkinter)
+- Guarda en `discusiones/bugs/backlog.md` + `screenshots/bug-NNN.png`
+- Funciona con CUALQUIER aplicación (OS-level, no depende del framework)
+- Se activa automáticamente al iniciar sesión IA (auto_setup.py)
+- Ciclo: bugs acumulan → arquitecto agrupa → discusión → plan → dev arregla
+
+### Review post-plan (caveman)
+- `finalizar_plan.py` ahora genera `memoria/[modulo]/review.md` automáticamente
+- Formato ultra-comprimido: lista de cambios + checklist de verificación
+- Limpia screenshots de bugs resueltos al cerrar plan de tipo fix
+
+### Scripts de ejecución
+- `run.bat` y `run.sh` creados en raíz del proyecto al instalar
+- El arquitecto los configura según stack en discusión 0-vision
+- El dev solo ejecuta el script para lanzar la app
+
+### Git
+- Permisos actualizados: `git log`, `git diff` ahora permitidos (además de `git status`)
+- `git commit/push/add` sigue prohibido para IAs
+
+
 ### Mejorado: gitignore inteligente para trabajo en equipo
 - Se actualizó `instalar.py` y `migrar.py` para que autoconfiguren el `.gitignore` del proyecto que recibe el sistema IA. 
 - Ahora, `ESTADO.md`, `sistema-ia/discusiones/`, y `sistema-ia/planes/` **sí** se rastrean por defecto en Git para que el equipo pueda mantenerse sincronizado. 

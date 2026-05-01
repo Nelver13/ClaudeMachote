@@ -1,35 +1,39 @@
-# PROMPT DE INSTALACIÓN — Sistema Multi-IA v2.4
-> Pega esto a Claude Code al inicio de un proyecto nuevo.
+# PROMPT DE INSTALACIÓN — Sistema Multi-IA v2.6
+> Pega esto a cualquier IA al inicio de un proyecto nuevo.
 
 ---
 
 ```
-Instala el sistema multi-IA en este proyecto. Sigue los pasos en orden.
+Instala el sistema multi-IA en este proyecto.
 
-PASO 1 — Clona el sistema en la raíz del proyecto:
+PASO 1 — Clona el sistema:
 git clone git@github.com:Nelver13/ClaudeMachote.git sistema-ia
 
 PASO 2 — Ejecuta el instalador:
 python sistema-ia/machote/instalar.py
 
-Esto crea: archivos raíz del proyecto, carpetas sistema-ia/, .claude/settings.json con hooks automáticos.
+Esto hace TODO automáticamente:
+- Crea archivos raíz (ESTADO.md, AGENTS.md, INICIO.md, etc.)
+- Crea carpetas (planes/, discusiones/, bugs/, memoria/)
+- Configura .claude/settings.json con hooks
+- Borra .git/ de sistema-ia (sin repo anidado)
+- Crea discusión de visión (0-vision)
+- Crea backlog de bugs
+- Genera run.bat/run.sh base
+- Instala dependencias del bug reporter
 
 PASO 3 — Configúrame el proyecto. Pregúntame UNA por UNA:
 1. ¿Nombre del proyecto?
-2. ¿Stack? (backend / frontend / fullstack / mobile / otro)
+2. ¿Stack? (backend / frontend / fullstack / mobile / desktop)
 3. ¿IAs que van a trabajar? (Claude / Kimi / Codex / Gemini)
-4. ¿Rol de cada IA hoy? (ARQUITECTO o DESARROLLADOR)
+4. ¿Rol de cada IA? (ARQUITECTO o DESARROLLADOR)
 
-PASO 4 — Con esas respuestas actualiza:
-- ESTADO.md → reemplaza NOMBRE_PROYECTO, ajusta roles
-- CLAUDE.md / KIMI.md / CODEX.md / GEMINI.md → reemplaza NOMBRE_PROYECTO
+Con esas respuestas actualiza ESTADO.md y los archivos de IA.
 
-PASO 5 — Verifica que sistema-ia/ está en .gitignore. Si no, agrégalo.
+PASO 4 — Listo. Arranca la discusión de visión (0-vision).
 
-PASO 6 — Avisa: "Listo — [nombre] configurado. Abre Claude Code para empezar."
-
-Reglas desde ya:
+Reglas:
 - Sin saludos ni relleno. Respuestas cortas.
-- Una pregunta a la vez. Espera respuesta antes de la siguiente.
-- git commit/push/pull/add — NUNCA. Solo el humano toca git.
+- Una pregunta a la vez.
+- git commit/push/add — NUNCA.
 ```

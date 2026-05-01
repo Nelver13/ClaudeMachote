@@ -124,8 +124,36 @@ def detectar_version_desfase() -> str | None:
         return None
 
 
+def lanzar_bug_reporter():
+    """Lanza el bug reporter en background si no está corriendo."""
+    reporter = Path(__file__).parent / "reportar.py"
+    if not reporter.exists():
+        return
+    try:
+        # Verificar si ya está corriendo
+        import subprocess
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-Command",
+             "Get-Process python* | Where-Object {$_.CommandLine -like '*reportar.py*'} | Select-Object -First 1"],
+            capture_output=True, text=True, timeout=5
+        )
+        if "reportar" in result.stdout.lower():
+            return  # Ya corriendo
+
+        # Lanzar en background
+        subprocess.Popen(
+            [sys.executable, str(reporter)],
+            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        pass  # Silencioso — no bloquea el inicio
+
+
 def main():
     proteger_gitignore()
+    lanzar_bug_reporter()
 
     if not proyecto_configurado():
         output = {
@@ -149,7 +177,6 @@ No hagas nada más hasta completar la configuración."""
     else:
         estado = leer_estado()
         ultima = leer_ultima_sesion()
-        aviso_version = detectar_version_desfase()
 
         proj    = estado.get("PROJ", "?")
         modulo  = estado.get("MODULO", "ninguno")
@@ -161,17 +188,17 @@ No hagas nada más hasta completar la configuración."""
         estado_plan= estado.get("ESTADO_PLAN", "")
 
         sesion_ctx = f"\nÚltima sesión:\n{ultima}" if ultima else ""
-        update_ctx = f"\n\n{aviso_version}\n" if aviso_version else ""
 
         output = {
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",
                 "additionalContext": f"""SISTEMA-IA CARGADO — {proj}
+🐛 Bug reporter activo — Ctrl+Shift+B para reportar
 Checkpoint: {checkpoint}
 Módulo: {modulo} | Plan: {plan} | Progreso: {progreso}
 Estado plan: {estado_plan}
 Último aviso: {last_aviso}
-Próxima tarea: {next_task}{sesion_ctx}{update_ctx}
+Próxima tarea: {next_task}{sesion_ctx}
 
 Lee INICIO.md → detecta tu rol → confirma con una línea y espera instrucciones."""
             }
