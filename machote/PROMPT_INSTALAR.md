@@ -1,4 +1,4 @@
-# PROMPT DE INSTALACIÓN — Sistema Multi-IA v2.6
+# PROMPT DE INSTALACIÓN — Sistema Multi-IA v2.7
 > Pega esto a cualquier IA al inicio de un proyecto nuevo.
 
 ---

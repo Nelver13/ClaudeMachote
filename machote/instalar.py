@@ -179,6 +179,9 @@ instalar.py
 ## Decisiones cerradas
 (vacío)
 
+## Ideas Futuras (A consideración)
+(vacío)
+
 ## Tema actual
 ### 1. ¿Qué es este proyecto?
 Describe en 1-2 líneas qué hace y para quién.
@@ -251,68 +254,11 @@ echo "Ejemplo: npm run dev / python manage.py runserver / cargo tauri dev"
         )
         print("  OK: Pillow + pynput + SpeechRecognition instalados")
 def mostrar_guia_tkinter():
+    import subprocess
     try:
-        import tkinter as tk
-        from tkinter import font
-        
-        root = tk.Tk()
-        root.title("🚀 ClaudeMachote Instalado con Éxito")
-        root.geometry("600x550")
-        root.configure(bg="#1a1a2e")
-        root.attributes("-topmost", True)
-        
-        # Estilos
-        bg_color = "#1a1a2e"
-        fg_color = "#e0e0e0"
-        accent_color = "#e94560"
-        title_font = font.Font(family="Segoe UI", size=16, weight="bold")
-        h2_font = font.Font(family="Segoe UI", size=12, weight="bold")
-        text_font = font.Font(family="Segoe UI", size=10)
-        
-        # Contenedor principal con padding
-        main_frame = tk.Frame(root, bg=bg_color, padx=30, pady=20)
-        main_frame.pack(fill="both", expand=True)
-        
-        # Título
-        tk.Label(main_frame, text="✅ Instalación Completa", font=title_font, fg=accent_color, bg=bg_color).pack(anchor="w", pady=(0, 15))
-        
-        # Sección 1
-        tk.Label(main_frame, text="¿QUÉ ES ESTE SISTEMA?", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(10, 5))
-        desc = "Has configurado una arquitectura multi-IA (Arquitecto/Dev).\nEl sistema organiza el trabajo en: discusiones -> planes -> código.\nMantiene el estado guardado para que la IA nunca pierda contexto."
-        tk.Label(main_frame, text=desc, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
-        
-        # Sección 2
-        tk.Label(main_frame, text="🐛 NUEVO: BUG REPORTER (v2.6)", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(15, 5))
-        bugs = "1. Presiona Alt+R en cualquier momento.\n2. Dibuja rectángulos rojos señalando el error en pantalla.\n3. Escribe qué falla (se guarda en: discusiones/bugs/backlog.md).\n4. La IA (Arquitecto) leerá los bugs para planear cómo arreglarlos."
-        tk.Label(main_frame, text=bugs, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
-        
-        # Sección 3
-        tk.Label(main_frame, text="🔄 SCRIPTS DE EJECUCIÓN", font=h2_font, fg="#4facf7", bg=bg_color).pack(anchor="w", pady=(15, 5))
-        scripts = "Usa siempre run.bat o ./run.sh para iniciar tu proyecto.\nEstos scripts arrancan tu app Y lanzan el Bug Reporter en background."
-        tk.Label(main_frame, text=scripts, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
-        
-        # Sección 4
-        tk.Label(main_frame, text="📝 PRÓXIMOS PASOS (Obligatorio):", font=h2_font, fg=accent_color, bg=bg_color).pack(anchor="w", pady=(15, 5))
-        pasos = "1. Abre ESTADO.md → reemplaza NOMBRE_PROYECTO y ajusta roles.\n2. Abre CLAUDE.md/KIMI.md/etc → reemplaza NOMBRE_PROYECTO.\n3. Abre tu editor (ej. Cursor/VSCode) e invoca a tu IA.\n4. Pega el PROMPT DE INSTALACIÓN (está en el README de GitHub).\n5. Sigue las instrucciones de la IA para iniciar la visión (0-vision)."
-        tk.Label(main_frame, text=pasos, font=text_font, fg=fg_color, bg=bg_color, justify="left").pack(anchor="w")
-        
-        # Botón cerrar
-        btn_frame = tk.Frame(main_frame, bg=bg_color)
-        btn_frame.pack(fill="x", pady=(25, 0))
-        tk.Button(btn_frame, text="Entendido, ¡A codear!", command=root.destroy, 
-                  font=h2_font, bg=accent_color, fg="white", relief="flat", padx=20, pady=8).pack()
-        
-        # Centrar ventana
-        root.update_idletasks()
-        width = root.winfo_width()
-        height = root.winfo_height()
-        x = (root.winfo_screenwidth() // 2) - (width // 2)
-        y = (root.winfo_screenheight() // 2) - (height // 2)
-        root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-        
-        root.mainloop()
+        subprocess.run([sys.executable, "sistema-ia/acciones/guia.py"], check=False)
     except Exception as e:
-        print("\n¡Instalación completa! (Error lanzando interfaz gráfica)")
+        print(f"No se pudo mostrar la guía gráfica: {e}")
 
 def main():
     destino = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()

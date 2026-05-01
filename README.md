@@ -105,7 +105,7 @@ python sistema-ia/acciones/avisar.py "Sistema actualizado a vX.Y" normal
 
 ## 🐛 Bug Reporter Universal con Dictado por Voz
 
-A partir de la versión v2.6, el sistema incluye un reporte de bugs activable mediante **Alt+R**.
+A partir de la versión v2.7, el sistema incluye un reporte de bugs activable mediante **Alt+R**.
 Te permite capturar la pantalla, dibujar rectángulos rojos enumerados para señalar el problema y escribir una descripción. 
 
 Además, cuenta con una función de **🎤 Dictado por Voz (estilo Walkie-Talkie)**: presionas el botón para grabar, hablas tu reporte, vuelves a presionar, y la IA transcribirá automáticamente tu voz a texto.
