@@ -19,9 +19,13 @@ git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia-temp
 
 == PASO 2 — Copiar solo scripts y skills ==
 Copia SOLO estos directorios del clon nuevo al existente:
-- sistema-ia-temp/acciones/ → sistema-ia/acciones/ (reemplazar todo)
-- sistema-ia-temp/.claude/skills/ → sistema-ia/.claude/skills/ (reemplazar todo)
-- sistema-ia-temp/VERSION → sistema-ia/VERSION
+- sistema-ia-temp/sistema-ia/acciones/ → sistema-ia/acciones/ (reemplazar TODO el contenido)
+- sistema-ia-temp/sistema-ia/.claude/skills/ → sistema-ia/.claude/skills/ (reemplazar todo)
+- sistema-ia-temp/sistema-ia/VERSION → sistema-ia/VERSION
+
+IMPORTANTE: En particular, confirma que existan estos archivos nuevos después de copiar:
+- sistema-ia/acciones/guia.py
+- sistema-ia/acciones/reportar.py
 
 NO tocar: discusiones/ planes/ memoria/ handoff/ ESTADO.md
 
