@@ -20,6 +20,7 @@ Uso:
 """
 import argparse
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -337,13 +338,26 @@ def sincronizar(origen: Path, destino: Path, dry_run: bool) -> dict:
             "  Revisa si contiene trabajo del proyecto antes de borrarlo manualmente."
         )
 
-    # Detectar .git anidado
+    # Detectar .git anidado y borrarlo
     git_anidado = destino / "sistema-ia" / ".git"
     if git_anidado.exists():
-        reporte["advertencias"].append(
-            f"Repo git anidado detectado: {git_anidado}\n"
-            "  Esto puede causar problemas con git status. Considera eliminarlo."
-        )
+        try:
+            shutil.rmtree(git_anidado)
+            reporte["creados"].append("sistema-ia/.git/ eliminado (repo anidado)")
+        except Exception as e:
+            reporte["advertencias"].append(
+                f"No se pudo borrar {git_anidado}: {e}\n"
+                "  Eliminálo manualmente para evitar problemas con git status."
+            )
+
+    # Borrar machote/ residuo si existe
+    machote_residuo = destino / "sistema-ia" / "machote"
+    if machote_residuo.exists():
+        try:
+            shutil.rmtree(machote_residuo)
+            reporte["creados"].append("sistema-ia/machote/ eliminado (residuo)")
+        except Exception as e:
+            reporte["advertencias"].append(f"No se pudo borrar {machote_residuo}: {e}")
 
     return reporte
 
