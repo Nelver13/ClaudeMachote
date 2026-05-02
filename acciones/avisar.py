@@ -145,7 +145,7 @@ def send_webhook(mensaje, tipo):
             u, data=data, method='POST',
             headers={
                 'Content-Type': 'application/json',
-                'User-Agent': 'ClaudeMachote/avisar.py',
+                'User-Agent': 'sistema-ia/avisar.py',
             }
         )
         with urllib.request.urlopen(req, timeout=10) as r:

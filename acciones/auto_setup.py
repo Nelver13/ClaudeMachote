@@ -83,6 +83,27 @@ def leer_ultima_sesion() -> str:
     return sesiones[0].read_text(encoding="utf-8")[-500:]
 
 
+def leer_comandos_pendientes() -> str:
+    """Lee comandos enviados desde la app móvil (handoff/comando_*.md)."""
+    handoff = SIA / "handoff"
+    if not handoff.exists():
+        return ""
+    comandos = sorted(handoff.glob("comando_*.md"))
+    if not comandos:
+        return ""
+    partes = []
+    for c in comandos:
+        try:
+            partes.append(c.read_text(encoding="utf-8"))
+            # Mover a procesados para no repetir
+            proc = handoff / "procesados"
+            proc.mkdir(exist_ok=True)
+            c.rename(proc / c.name)
+        except Exception:
+            pass
+    return "\n---\n".join(partes)
+
+
 def auto_actualizar() -> str | None:
     """
     Si hay version nueva en origin:
@@ -200,6 +221,7 @@ No hagas nada mas hasta completar la configuracion."""
         estado       = leer_estado()
         ultima       = leer_ultima_sesion()
         actualizacion = auto_actualizar()
+        comandos     = leer_comandos_pendientes()
 
         proj       = estado.get("PROJ", "?")
         modulo     = estado.get("MODULO", "ninguno")
@@ -212,6 +234,7 @@ No hagas nada mas hasta completar la configuracion."""
 
         sesion_ctx  = f"\nUltima sesion:\n{ultima}" if ultima else ""
         update_ctx  = f"\n\n{'='*50}\n{actualizacion}\n{'='*50}" if actualizacion else ""
+        cmd_ctx     = f"\n\n{'='*50}\nCOMANDOS PENDIENTES DESDE APP MOVIL:\n{comandos}\n{'='*50}" if comandos else ""
 
         output = {
             "hookSpecificOutput": {
@@ -221,7 +244,7 @@ Checkpoint: {checkpoint}
 Modulo: {modulo} | Plan: {plan} | Progreso: {progreso}
 Estado plan: {estado_plan}
 Ultimo aviso: {last_aviso}
-Proxima tarea: {next_task}{sesion_ctx}{update_ctx}
+Proxima tarea: {next_task}{sesion_ctx}{update_ctx}{cmd_ctx}
 
 Lee INICIO.md -> detecta tu rol -> confirma con una linea y espera instrucciones."""
             }

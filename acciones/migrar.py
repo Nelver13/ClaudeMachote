@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-migrar.py — Desde v2.4 los scripts están en git (acciones/ en la raíz del repo).
-git pull en sistema-ia/ los actualiza directamente — no se copian.
+migrar.py — Verificación y migración ligera para proyectos con sistema-ia.
 
-Este script solo: crea carpetas faltantes, limpia pre-v2.0, confirma estado.
+Desde v2.7: usa actualizar.py para actualizaciones completas.
+Este script solo hace limpieza de obsoletos y verificación de estructura.
 
 Uso: python sistema-ia/acciones/migrar.py
 """
 import shutil
+import sys
 from pathlib import Path
 from datetime import datetime
 
@@ -44,7 +45,7 @@ def limpiar_viejos():
     stamp = datetime.now().strftime("%Y%m%d_%H%M")
     bk = BACKUP_DIR / f"{stamp}_pre2"
     for nombre in ARCHIVOS_VIEJOS + CARPETAS_VIEJAS:
-        p = ROOT / nombre
+        p = SIA / nombre
         if p.exists():
             bk.mkdir(parents=True, exist_ok=True)
             shutil.move(str(p), str(bk / nombre))
@@ -57,6 +58,13 @@ def main():
     print(f"=== Sistema IA v{v} — verificación ===")
     print(f"Proyecto: {ROOT.name}")
     print()
+
+    # Sugerir actualizar.py si existe
+    actualizar = Path(__file__).parent / "actualizar.py"
+    if actualizar.exists():
+        print("ℹ Para actualización COMPLETA del sistema, usa:")
+        print(f"   python {actualizar}")
+        print()
 
     viejos = limpiar_viejos()
     if viejos:
@@ -73,8 +81,12 @@ def main():
     else:
         print("Carpetas: OK")
 
-    print("Scripts: en git -- actualizados via 'cd sistema-ia && git pull' OK")
-    print("Skills:  en git -- actualizadas via 'cd sistema-ia && git pull' OK")
+    # Detectar instalación recursiva
+    recursivo = SIA / "sistema-ia"
+    if recursivo.exists():
+        print()
+        print("⚠ ADVERTENCIA: Detectada instalación recursiva (sistema-ia/sistema-ia/)")
+        print("   Ejecuta python instalar.py para limpiar, o elimina manualmente.")
 
     print()
     print("INTACTO:")

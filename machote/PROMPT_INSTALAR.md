@@ -6,23 +6,21 @@
 ```
 Instala el sistema multi-IA en este proyecto.
 
-PASO 1 — Clona el sistema:
+PASO 1 — Clona y ejecuta:
 git clone https://github.com/Nelver13/ClaudeMachote.git sistema-ia
+python sistema-ia/instalar.py
 
-PASO 2 — Ejecuta el instalador:
-python sistema-ia/machote/instalar.py
+Eso hace TODO automáticamente:
+- Archivos raíz (ESTADO.md, AGENTS.md, INICIO.md, etc.)
+- Carpetas (planes/, discusiones/, bugs/, memoria/)
+- .claude/settings.json con hooks
+- run.bat y run.sh base
+- Discusión 0-vision creada
+- Backlog de bugs creado
+- Dependencias instaladas (Pillow, pynput, SpeechRecognition, pyaudio)
+- Guía de inicio mostrada
 
-Esto hace TODO automáticamente:
-- Crea archivos raíz (ESTADO.md, AGENTS.md, INICIO.md, etc.)
-- Crea carpetas (planes/, discusiones/, bugs/, memoria/)
-- Configura .claude/settings.json con hooks
-- Borra .git/ de sistema-ia (sin repo anidado)
-- Crea discusión de visión (0-vision)
-- Crea backlog de bugs
-- Genera run.bat/run.sh base
-- Instala dependencias del bug reporter
-
-PASO 3 — Configúrame el proyecto. Pregúntame UNA por UNA:
+PASO 2 — Configúrame el proyecto. Pregúntame UNA por UNA:
 1. ¿Nombre del proyecto?
 2. ¿Stack? (backend / frontend / fullstack / mobile / desktop)
 3. ¿IAs que van a trabajar? (Claude / Kimi / Codex / Gemini)
@@ -30,7 +28,7 @@ PASO 3 — Configúrame el proyecto. Pregúntame UNA por UNA:
 
 Con esas respuestas actualiza ESTADO.md y los archivos de IA.
 
-PASO 4 — Listo. Arranca la discusión de visión (0-vision).
+PASO 3 — Listo. Arranca la discusión de visión (0-vision).
 
 Reglas:
 - Sin saludos ni relleno. Respuestas cortas.
